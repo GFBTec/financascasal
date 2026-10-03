@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Expense, Screen } from './domain/types';
 import { contributionFor, expensesInMonth } from './domain/calculations';
 import { TWEAKS } from './config/tweaks';
@@ -22,8 +22,13 @@ import './components/layout/layout.css';
 type ExpenseModalState = { expense?: Expense } | null;
 
 export default function App() {
-  const { expenses, contribs, saveExpense, deleteExpense, setContribution } = useGastos();
+  const { expenses, contribs, saveExpense, deleteExpense, setContribution, syncError } = useGastos();
   const toast = useToast();
+
+  const showToast = toast.show;
+  useEffect(() => {
+    if (syncError) showToast(syncError.message);
+  }, [syncError, showToast]);
 
   const [screen, setScreen] = useState<Screen>(TWEAKS.startScreen);
   const [monthKey, setMonthKey] = useState(currentMonthKey);

@@ -1,8 +1,5 @@
 import type { Budgets, Category, CategoryId, Contribution, PaymentMethod, Person, PersonId } from './types';
 
-export const STORAGE_KEY = 'enddy-bento-gastos-v1';
-export const STORAGE_VERSION = 2;
-
 export const CATEGORIES: Category[] = [
   { id: 'comida', name: 'Comida', color: 'oklch(0.66 0.13 60)' },
   { id: 'mercado', name: 'Mercado', color: 'oklch(0.58 0.11 145)' },

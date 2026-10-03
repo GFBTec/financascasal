@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { DEFAULT_BUDGETS, DEFAULT_CONTRIBUTION, DEFAULT_CONTRIBUTION_KEY } from '../domain/constants';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { DEFAULT_BUDGETS } from '../domain/constants';
 import type { Budgets, CategoryId, Contribution, Contributions, Expense } from '../domain/types';
-import { loadData, saveData } from '../data/storage';
+import * as repo from '../data/repository';
 import { seedData } from '../data/seed';
+import { FullScreen } from '../components/layout/FullScreen';
 
 interface GastosData {
   expenses: Expense[];
@@ -21,44 +22,124 @@ interface GastosActions {
   clearExpenses: () => void;
 }
 
-type GastosContextValue = GastosData & GastosActions;
+/** Erro ao gravar no Supabase. `id` muda a cada ocorrência para o aviso reaparecer. */
+export interface SyncError {
+  id: number;
+  message: string;
+}
+
+type GastosContextValue = GastosData & GastosActions & { syncError: SyncError | null };
 
 const GastosContext = createContext<GastosContextValue | null>(null);
 
-function initialData(): GastosData {
-  const data = loadData();
-  return {
-    expenses: data?.expenses ?? seedData(),
-    budgets: { ...DEFAULT_BUDGETS, ...data?.budgets },
-    contribs: data?.contribs ?? { [DEFAULT_CONTRIBUTION_KEY]: { ...DEFAULT_CONTRIBUTION } },
-  };
-}
+const BUDGET_SAVE_DELAY = 600;
+const RELOAD_DELAY = 400;
 
+/**
+ * Estado compartilhado do casal, guardado no Supabase.
+ * Atualiza a tela na hora (otimista) e grava em segundo plano; se a gravação falhar,
+ * avisa e recarrega do banco. Mudanças feitas em outro aparelho chegam via Realtime.
+ */
 export function GastosProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<GastosData | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [syncError, setSyncError] = useState<SyncError | null>(null);
+  const reloadTimer = useRef<number | undefined>(undefined);
+  const budgetTimers = useRef<Partial<Record<CategoryId, number>>>({});
 
-  useEffect(() => saveData(data), [data]);
+  const reload = useCallback(async () => {
+    try {
+      const remote = await repo.fetchAll();
+      setData({ ...remote, budgets: { ...DEFAULT_BUDGETS, ...remote.budgets } });
+      setLoadFailed(false);
+    } catch (e) {
+      console.error(e);
+      setLoadFailed(true);
+    }
+  }, []);
 
-  const actions = useMemo<GastosActions>(
-    () => ({
-      saveExpense: (expense) =>
-        setData((d) => ({
+  useEffect(() => {
+    reload();
+    const unsubscribe = repo.subscribeToChanges(() => {
+      window.clearTimeout(reloadTimer.current);
+      reloadTimer.current = window.setTimeout(reload, RELOAD_DELAY);
+    });
+    const timers = budgetTimers.current;
+    return () => {
+      unsubscribe();
+      window.clearTimeout(reloadTimer.current);
+      Object.values(timers).forEach((t) => window.clearTimeout(t));
+    };
+  }, [reload]);
+
+  const actions = useMemo<GastosActions>(() => {
+    const update = (fn: (d: GastosData) => GastosData) => setData((d) => d && fn(d));
+    const sync = (op: Promise<unknown>) =>
+      op.catch((e) => {
+        console.error(e);
+        setSyncError({ id: Date.now(), message: 'Não foi possível salvar. Verifique a conexão.' });
+        reload();
+      });
+
+    return {
+      saveExpense: (expense) => {
+        update((d) => ({
           ...d,
           expenses: d.expenses.some((e) => e.id === expense.id)
             ? d.expenses.map((e) => (e.id === expense.id ? expense : e))
             : [...d.expenses, expense],
-        })),
-      deleteExpense: (id) => setData((d) => ({ ...d, expenses: d.expenses.filter((e) => e.id !== id) })),
-      setBudget: (cat, value) => setData((d) => ({ ...d, budgets: { ...d.budgets, [cat]: value } })),
-      setContribution: (monthKey, value) =>
-        setData((d) => ({ ...d, contribs: { ...d.contribs, [monthKey]: value } })),
-      resetSample: () => setData((d) => ({ ...d, expenses: seedData(), budgets: { ...DEFAULT_BUDGETS } })),
-      clearExpenses: () => setData((d) => ({ ...d, expenses: [] })),
-    }),
-    [],
-  );
+        }));
+        sync(repo.upsertExpense(expense));
+      },
+      deleteExpense: (id) => {
+        update((d) => ({ ...d, expenses: d.expenses.filter((e) => e.id !== id) }));
+        sync(repo.deleteExpense(id));
+      },
+      setBudget: (cat, value) => {
+        update((d) => ({ ...d, budgets: { ...d.budgets, [cat]: value } }));
+        // Grava só quando a pessoa para de digitar.
+        window.clearTimeout(budgetTimers.current[cat]);
+        budgetTimers.current[cat] = window.setTimeout(
+          () => sync(repo.upsertBudgets({ [cat]: value })),
+          BUDGET_SAVE_DELAY,
+        );
+      },
+      setContribution: (monthKey, value) => {
+        update((d) => ({ ...d, contribs: { ...d.contribs, [monthKey]: value } }));
+        sync(repo.upsertContribution(monthKey, value));
+      },
+      resetSample: () => {
+        const expenses = seedData();
+        update((d) => ({ ...d, expenses, budgets: { ...DEFAULT_BUDGETS } }));
+        sync(
+          (async () => {
+            await repo.deleteAllExpenses();
+            await repo.insertExpenses(expenses);
+            await repo.upsertBudgets(DEFAULT_BUDGETS);
+          })(),
+        );
+      },
+      clearExpenses: () => {
+        update((d) => ({ ...d, expenses: [] }));
+        sync(repo.deleteAllExpenses());
+      },
+    };
+  }, [reload]);
 
-  const value = useMemo(() => ({ ...data, ...actions }), [data, actions]);
+  const value = useMemo(() => data && { ...data, ...actions, syncError }, [data, actions, syncError]);
+
+  if (!value) {
+    return loadFailed ? (
+      <FullScreen
+        title="Não deu para carregar"
+        message="Verifique sua conexão e tente de novo."
+        action={{ label: 'Tentar de novo', onClick: reload }}
+      />
+    ) : (
+      <FullScreen message="Carregando gastos…" />
+    );
+  }
+
   return <GastosContext.Provider value={value}>{children}</GastosContext.Provider>;
 }
 

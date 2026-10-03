@@ -3,7 +3,19 @@
 App para Enddy & Bento registrarem gastos, controlarem mês a mês e acompanharem a conta conjunta.
 Especificação completa em [docs/ESPECIFICACAO.md](docs/ESPECIFICACAO.md); o protótipo original está em [docs/prototipo/](docs/prototipo/).
 
-**Stack:** Vite + React 19 + TypeScript · Vitest para testes · dados no `localStorage` (chave `enddy-bento-gastos-v1`, compatível com o protótipo).
+**Stack:** Vite + React 19 + TypeScript · Supabase (Postgres, Auth, Realtime) · Vitest para testes.
+
+## Supabase
+
+1. Rode [supabase/migrations/20261003120000_schema_inicial.sql](supabase/migrations/20261003120000_schema_inicial.sql)
+   no **SQL Editor** (ou deixe a integração GitHub do Supabase aplicar a migration).
+2. Libere os e-mails do casal: `insert into public.members (email) values ('a@x.com'), ('b@x.com');`
+3. Crie os dois usuários em **Authentication → Users → Add user** (marque *Auto Confirm User*) e,
+   em **Authentication → Sign In / Providers**, desative *Allow new users to sign up*.
+4. Copie `.env.example` para `.env.local` e preencha URL e publishable key (as mesmas variáveis vão
+   em **Vercel → Settings → Environment Variables**).
+
+Segurança: todas as tabelas usam RLS; só e-mails em `members` leem ou gravam dados.
 
 ## Comandos
 
@@ -27,9 +39,12 @@ src/
 │   ├── constants.ts         # categorias, pessoas, cores, padrões
 │   └── calculations.ts      # totais, séries diárias, filtros, agrupamentos (+ testes)
 ├── data/
-│   ├── storage.ts           # leitura/gravação no localStorage (+ migração v1)
+│   ├── repository.ts        # leitura/gravação no Supabase + Realtime
 │   └── seed.ts              # 6 meses de dados de exemplo
-├── state/GastosContext.tsx  # estado global (gastos, orçamento, conta do casal) + ações
+├── state/
+│   ├── AuthContext.tsx      # sessão, login e verificação de membro
+│   └── GastosContext.tsx    # estado compartilhado (otimista, sincroniza com o Supabase)
+├── screens/login/           # tela de login (e-mail + senha)
 ├── hooks/                   # useToast, useConfirm (ação em dois toques)
 ├── lib/                     # datas, formatação BRL, parse de valores, cores
 ├── styles/                  # tokens.css (design tokens) + global.css (componentes base)

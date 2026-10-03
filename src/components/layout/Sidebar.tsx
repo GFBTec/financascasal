@@ -1,5 +1,6 @@
 import { PEOPLE } from '../../domain/constants';
 import type { Screen } from '../../domain/types';
+import { useAuth } from '../../state/AuthContext';
 import { Dot } from '../ui/Dot';
 import { Brand } from './Brand';
 import { NAV_ITEMS } from './nav';
@@ -12,6 +13,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: SidebarProps) {
+  const { email, signOut } = useAuth();
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
@@ -51,6 +53,12 @@ export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: Sideba
         <div className="row">
           <Dot color={PEOPLE.casal.color} size={10} />
           Casal · conta conjunta
+        </div>
+        <div className="sidebar__account">
+          <span title={email}>{email}</span>
+          <button type="button" className="btn-link" onClick={signOut}>
+            Sair
+          </button>
         </div>
       </div>
     </aside>

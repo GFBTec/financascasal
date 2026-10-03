@@ -3,6 +3,7 @@ import { CATEGORIES, COLORS } from '../../domain/constants';
 import { budgetTotal, sumAmounts } from '../../domain/calculations';
 import type { Expense } from '../../domain/types';
 import { useGastos } from '../../state/GastosContext';
+import { useAuth } from '../../state/AuthContext';
 import { useConfirm } from '../../hooks/useConfirm';
 import { Card } from '../../components/ui/Card';
 import { Dot } from '../../components/ui/Dot';
@@ -19,6 +20,7 @@ interface OrcamentoScreenProps {
 
 export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoScreenProps) {
   const { budgets, setBudget, resetSample, clearExpenses } = useGastos();
+  const { email, signOut } = useAuth();
   const month = monthName(monthKey);
 
   const spentByCat = useMemo(
@@ -29,6 +31,12 @@ export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoS
   const clear = useConfirm(() => {
     clearExpenses();
     onToast('Todos os gastos apagados');
+  }, 3000);
+
+  // Os dados agora são compartilhados: substituir pelo exemplo também pede confirmação.
+  const reset = useConfirm(() => {
+    resetSample();
+    onToast('Dados de exemplo restaurados');
   }, 3000);
 
   return (
@@ -77,17 +85,13 @@ export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoS
 
       <section className="row" style={{ flexWrap: 'wrap', padding: '6px 2px' }}>
         <span className="muted" style={{ fontSize: 13, flex: '1 1 200px' }}>
-          Dados salvos neste navegador.
+          Conectado como {email} ·{' '}
+          <button type="button" className="btn-link" onClick={signOut}>
+            Sair
+          </button>
         </span>
-        <button
-          type="button"
-          className="btn-outline"
-          onClick={() => {
-            resetSample();
-            onToast('Dados de exemplo restaurados');
-          }}
-        >
-          Restaurar exemplo
+        <button type="button" className="btn-outline" onClick={reset.trigger}>
+          {reset.armed ? 'Toque de novo para substituir' : 'Restaurar exemplo'}
         </button>
         <button type="button" className="btn-danger" onClick={clear.trigger}>
           {clear.armed ? 'Toque de novo para apagar' : 'Apagar todos os gastos'}
