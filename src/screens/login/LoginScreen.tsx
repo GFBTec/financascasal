@@ -3,6 +3,20 @@ import { supabase } from '../../lib/supabase';
 import { COLORS } from '../../domain/constants';
 import { FullScreen } from '../../components/layout/FullScreen';
 
+function loginErrorMessage(code: string | undefined, message: string) {
+  switch (code) {
+    case 'invalid_credentials':
+      return 'E-mail ou senha incorretos.';
+    case 'email_not_confirmed':
+      return 'E-mail ainda não confirmado. Confirme o usuário no painel do Supabase.';
+    case 'over_request_rate_limit':
+    case 'over_email_send_rate_limit':
+      return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
+    default:
+      return `Não foi possível entrar: ${message}`;
+  }
+}
+
 export function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,13 +29,7 @@ export function LoginScreen() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-    if (error) {
-      setError(
-        error.message.includes('Invalid login credentials')
-          ? 'E-mail ou senha incorretos.'
-          : 'Não foi possível entrar. Tente de novo.',
-      );
-    }
+    if (error) setError(loginErrorMessage(error.code, error.message));
   };
 
   return (
