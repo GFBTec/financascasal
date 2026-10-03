@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Montserrat:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;background:#F3EEE4;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#1E1A15}a:hover{color:oklch(0.60 0.15 38)}
+input,button{font-family:inherit}
+input:focus{outline:2px solid oklch(0.60 0.15 38 / 0.5);outline-offset:1px}
+::-webkit-scrollbar{height:6px;width:8px}::-webkit-scrollbar-thumb{background:rgba(30,26,21,.18);border-radius:4px}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#F3EEE4;color:#1E1A15;font-family:'Montserrat',system-ui,sans-serif;display:flex;align-items:flex-start">
+
+  <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+    <aside style="position:sticky;top:0;width:248px;flex:none;height:100vh;padding:32px 20px 24px;display:flex;flex-direction:column;gap:28px;border-right:1px solid rgba(30,26,21,.1)">
+      <div style="display:flex;flex-direction:column;gap:4px;padding:0 10px">
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1;letter-spacing:-0.01em">Enddy <span style="font-style:italic;color:oklch(0.60 0.15 38)">&amp;</span> Bento</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">gastos a dois</div>
+      </div>
+      <nav style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+          <button onClick="{{ n.onClick }}" style="all:unset;cursor:pointer;padding:11px 12px;border-radius:10px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:space-between;background:{{ n.bg }};color:{{ n.fg }}" style-hover="background:rgba(30,26,21,.06)">
+            <span>{{ n.label }}</span><span style="font-family:'Geist Mono',monospace;font-size:11px;opacity:.6">{{ n.hint }}</span>
+          </button>
+        </sc-for>
+      </nav>
+      <button onClick="{{ openNew }}" style="all:unset;cursor:pointer;background:#1E1A15;color:#FBF8F1;padding:14px 16px;border-radius:12px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:space-between" style-hover="background:oklch(0.60 0.15 38)">
+        <span>Novo gasto</span><span style="font-size:20px;line-height:1">+</span>
+      </button>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:0 10px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.60 0.15 38)"></span>Enddy</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.42 0.07 230)"></span>Bento</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.55 0.10 160)"></span>Casal · conta conjunta</div>
+      </div>
+    </aside>
+  </sc-if>
+
+  <main style="flex:1;min-width:0;padding:clamp(18px,3vw,40px);padding-bottom:{{ mainPadBottom }};max-width:1240px">
+
+    <header style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'Instrument Serif',serif;font-size:20px;line-height:1">Enddy <span style="font-style:italic;color:oklch(0.60 0.15 38)">&amp;</span> Bento</div>
+        </sc-if>
+        <h1 style="margin:0;font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(40px,5vw,56px);line-height:.95;letter-spacing:-0.02em">{{ screenTitle }}</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;background:#FBF8F1;border:1px solid rgba(30,26,21,.12);border-radius:999px;padding:4px">
+        <button onClick="{{ prevMonth }}" aria-label="Mês anterior" style="all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px" style-hover="background:rgba(30,26,21,.07)">‹</button>
+        <div style="min-width:132px;text-align:center;font-size:15px;font-weight:500">{{ monthLabel }}</div>
+        <button onClick="{{ nextMonth }}" aria-label="Próximo mês" style="all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;opacity:{{ nextOpacity }}" style-hover="background:rgba(30,26,21,.07)">›</button>
+      </div>
+    </header>
+
+    <!-- PAINEL -->
+    <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <div style="display:flex;flex-wrap:wrap;gap:16px">
+          <section style="flex:2 1 440px;min-width:0;background:#1E1A15;color:#FBF8F1;border-radius:20px;padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:22px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(251,248,241,.72)"><span style="width:8px;height:8px;border-radius:50%;background:oklch(0.78 0.10 160)"></span>{{ casal.label }}</div>
+              <button onClick="{{ openContrib }}" style="all:unset;cursor:pointer;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid rgba(251,248,241,.3);color:#FBF8F1" style-hover="background:rgba(251,248,241,.1)">Editar valor</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-family:'Instrument Serif',serif;font-size:clamp(52px,8vw,92px);line-height:.9;letter-spacing:-0.025em">{{ casal.depF }}</div>
+              <div style="font-size:14px;color:rgba(251,248,241,.72)">{{ casal.split }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="height:8px;border-radius:99px;background:rgba(251,248,241,.14);overflow:hidden">
+                <div style="height:100%;border-radius:99px;width:{{ casal.usedW }};background:{{ casal.barColor }};transition:width .5s"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;color:rgba(251,248,241,.78)">
+                <span>{{ casal.usedText }}</span><span style="color:#FBF8F1;font-weight:500">{{ casal.leftText }}</span>
+              </div>
+            </div>
+          </section>
+
+          <section style="flex:1 1 300px;min-width:0;background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px">
+            <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Quem gastou</div>
+            <div style="display:flex;height:14px;border-radius:99px;overflow:hidden;gap:3px;background:rgba(30,26,21,.06)">
+              <div style="width:{{ who.eW }};background:oklch(0.60 0.15 38);border-radius:99px;transition:width .5s"></div>
+              <div style="width:{{ who.bW }};background:oklch(0.42 0.07 230);border-radius:99px;transition:width .5s"></div>
+              <div style="width:{{ who.cW }};background:oklch(0.55 0.10 160);border-radius:99px;transition:width .5s"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ who.rows }}" as="p" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ p.color }}"></span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:15px;font-weight:500">{{ p.name }}</div>
+                    <div style="font-size:12.5px;color:#6E655A">{{ p.sub }}</div>
+                  </div>
+                  <div style="font-family:'Instrument Serif',serif;font-size:28px;line-height:1">{{ p.amountF }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:auto;padding-top:14px;border-top:1px dashed rgba(30,26,21,.18);font-size:14px;line-height:1.4;text-wrap:pretty">{{ who.diffText }}</div>
+          </section>
+        </div>
+
+        <section style="background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Evolução diária</div>
+            <div style="font-size:13.5px;color:#1E1A15">{{ dailyInfo }}</div>
+          </div>
+          <div onMouseLeave="{{ clearHover }}" style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-end;height:190px;gap:{{ barGap }};border-bottom:1px solid rgba(30,26,21,.14)">
+              <sc-for list="{{ daily }}" as="d" hint-placeholder-count="30">
+                <div onMouseEnter="{{ d.onEnter }}" onClick="{{ d.onEnter }}" title="{{ d.title }}" style="flex:1;min-width:0;height:100%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;cursor:pointer;border-radius:4px 4px 0 0;background:{{ d.bg }}">
+                  <sc-if value="{{ d.clipped }}">
+                    <div style="position:absolute;top:-2px;left:50%;transform:translate(-50%,-100%);font-family:'Geist Mono',monospace;font-size:10px;white-space:nowrap;color:#6E655A">↑ {{ d.clipLabel }}</div>
+                  </sc-if>
+                  <div style="height:{{ d.hB }};background:{{ d.cB }};border-radius:2px;transition:height .4s"></div>
+                  <div style="height:{{ d.hC }};background:{{ d.cC }};border-radius:2px;transition:height .4s"></div>
+                  <div style="height:{{ d.hE }};background:{{ d.cE }};border-radius:2px;transition:height .4s"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:{{ barGap }}">
+              <sc-for list="{{ daily }}" as="d" hint-placeholder-count="30">
+                <div style="flex:1;min-width:0;text-align:center;font-family:'Geist Mono',monospace;font-size:10.5px;color:{{ d.labelColor }}">{{ d.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;gap:18px;font-size:12.5px;color:#6E655A">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:oklch(0.60 0.15 38)"></span>Enddy</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:oklch(0.42 0.07 230)"></span>Bento</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:oklch(0.55 0.10 160)"></span>Casal</span>
+          </div>
+        </section>
+
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+          <section style="flex:1.4 1 420px;min-width:0;background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Por categoria</div>
+              <button onClick="{{ goOrcamento }}" style="all:unset;cursor:pointer;font-size:13px;color:#6E655A;text-decoration:underline;text-underline-offset:3px" style-hover="color:#1E1A15">Editar orçamento</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
+                <div style="display:flex;flex-direction:column;gap:7px;opacity:{{ c.opacity }}">
+                  <div style="display:flex;align-items:baseline;gap:10px">
+                    <span style="width:9px;height:9px;border-radius:3px;flex:none;background:{{ c.color }};align-self:center"></span>
+                    <span style="flex:1;min-width:0;font-size:14.5px;font-weight:500">{{ c.name }}</span>
+                    <span style="font-family:'Geist Mono',monospace;font-size:13px">{{ c.spentF }}</span>
+                    <span style="font-family:'Geist Mono',monospace;font-size:12px;color:{{ c.subColor }};min-width:92px;text-align:right">{{ c.sub }}</span>
+                  </div>
+                  <div style="height:6px;border-radius:99px;background:rgba(30,26,21,.07);overflow:hidden">
+                    <div style="height:100%;border-radius:99px;width:{{ c.w }};background:{{ c.barColor }};transition:width .5s"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:16px">
+            <section style="background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Últimos 6 meses</div>
+                <div style="font-size:13px;color:#6E655A">Total gasto por mês, dividido por quem pagou</div>
+                <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#1E1A15">
+                  <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.60 0.15 38)"></span>Enddy</span>
+                  <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.42 0.07 230)"></span>Bento</span>
+                  <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.55 0.10 160)"></span>Casal (conta conjunta)</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:12px;height:170px">
+                <sc-for list="{{ months }}" as="m" hint-placeholder-count="6">
+                  <button onClick="{{ m.onClick }}" title="{{ m.title }}" style="all:unset;cursor:pointer;flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;gap:6px;opacity:{{ m.opacity }}" style-hover="opacity:1">
+                    <div style="text-align:center;font-family:'Geist Mono',monospace;font-size:10.5px;white-space:nowrap">{{ m.valueF }}</div>
+                    <div style="display:flex;flex-direction:column;gap:2px;height:{{ m.h }};transition:height .4s">
+                      <div style="flex:{{ m.fB }};background:oklch(0.42 0.07 230);border-radius:4px 4px 2px 2px"></div>
+                      <div style="flex:{{ m.fC }};background:oklch(0.55 0.10 160);border-radius:2px"></div>
+                      <div style="flex:{{ m.fE }};background:oklch(0.60 0.15 38);border-radius:2px"></div>
+                    </div>
+                    <div style="text-align:center;font-size:12.5px;font-weight:{{ m.weight }}">{{ m.label }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A;margin-bottom:8px">Maiores gastos</div>
+              <sc-for list="{{ top }}" as="t" hint-placeholder-count="5">
+                <button onClick="{{ t.onClick }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:14px;padding:10px 8px;margin:0 -8px;border-radius:10px" style-hover="background:rgba(30,26,21,.05)">
+                  <span style="font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;width:18px;color:#6E655A">{{ t.rank }}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.desc }}</div>
+                    <div style="font-size:12.5px;color:#6E655A;display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:{{ t.whoColor }}"></span>{{ t.meta }}</div>
+                  </div>
+                  <span style="font-family:'Geist Mono',monospace;font-size:13.5px">{{ t.amountF }}</span>
+                </button>
+              </sc-for>
+              <sc-if value="{{ noTop }}">
+                <div style="font-size:14px;color:#6E655A;padding:8px 0">Nenhum gasto neste mês.</div>
+              </sc-if>
+            </section>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- GASTOS -->
+    <sc-if value="{{ isGastos }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+          <div style="display:flex;gap:4px;background:#FBF8F1;border:1px solid rgba(30,26,21,.12);border-radius:999px;padding:4px">
+            <sc-for list="{{ whoFilters }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.onClick }}" style="all:unset;cursor:pointer;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px;background:{{ f.bg }};color:{{ f.fg }}">
+                <span style="width:8px;height:8px;border-radius:50%;background:{{ f.dot }}"></span>{{ f.label }}
+              </button>
+            </sc-for>
+          </div>
+          <input value="{{ q }}" onChange="{{ onQuery }}" placeholder="Buscar descrição ou local" style="flex:1 1 220px;min-width:0;padding:12px 16px;border-radius:999px;border:1px solid rgba(30,26,21,.12);background:#FBF8F1;font-size:14.5px;color:#1E1A15">
+        </div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 -2px">
+          <sc-for list="{{ catFilters }}" as="f" hint-placeholder-count="8">
+            <button onClick="{{ f.onClick }}" style="all:unset;cursor:pointer;flex:none;padding:7px 12px;border-radius:999px;font-size:13.5px;display:flex;align-items:center;gap:7px;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }}">
+              <span style="width:8px;height:8px;border-radius:3px;background:{{ f.dot }}"></span>{{ f.label }}
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:4px 2px;border-bottom:1px solid rgba(30,26,21,.14)">
+          <span style="font-size:14px;color:#6E655A">{{ listSummary }}</span>
+          <span style="font-family:'Instrument Serif',serif;font-size:30px">{{ listTotalF }}</span>
+        </div>
+        <sc-if value="{{ listEmpty }}">
+          <div style="padding:48px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:28px">Nada por aqui.</div>
+            <div style="font-size:14.5px;color:#6E655A">{{ emptyText }}</div>
+            <button onClick="{{ openNew }}" style="all:unset;cursor:pointer;background:#1E1A15;color:#FBF8F1;padding:12px 18px;border-radius:12px;font-size:14.5px;font-weight:500">Adicionar gasto</button>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;padding:0 4px;font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#6E655A">
+                <span>{{ g.label }}</span><span>{{ g.totalF }}</span>
+              </div>
+              <div style="background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:16px;overflow:hidden">
+                <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+                  <button onClick="{{ it.onClick }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px;width:100%;box-sizing:border-box;border-top:{{ it.border }}" style-hover="background:rgba(30,26,21,.04)">
+                    <span style="width:36px;height:36px;border-radius:10px;flex:none;display:grid;place-items:center;background:{{ it.catSoft }};color:{{ it.catColor }};font-family:'Instrument Serif',serif;font-size:19px">{{ it.catInitial }}</span>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.desc }}</div>
+                      <div style="font-size:12.5px;color:#6E655A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.meta }}</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none">
+                      <span style="font-family:'Geist Mono',monospace;font-size:14px">{{ it.amountF }}</span>
+                      <span style="font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:99px;background:{{ it.whoSoft }};color:{{ it.whoColor }}">{{ it.whoName }}</span>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ORÇAMENTO -->
+    <sc-if value="{{ isOrcamento }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:760px">
+        <section style="background:#1E1A15;color:#FBF8F1;border-radius:20px;padding:24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(251,248,241,.72)">Orçamento mensal</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:clamp(44px,6vw,64px);line-height:.9">{{ budgetTotalF }}</div>
+          </div>
+          <div style="font-size:14px;color:rgba(251,248,241,.78);max-width:280px;text-wrap:pretty">Vale para todos os meses. Em {{ monthName }}, já foram {{ hero.totalF }}.</div>
+        </section>
+        <section style="background:#FBF8F1;border:1px solid rgba(30,26,21,.1);border-radius:20px;overflow:hidden">
+          <sc-for list="{{ budgetRows }}" as="b" hint-placeholder-count="11">
+            <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:{{ b.border }}">
+              <span style="width:10px;height:10px;border-radius:3px;flex:none;background:{{ b.color }}"></span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:15px;font-weight:500">{{ b.name }}</div>
+                <div style="font-size:12.5px;color:{{ b.subColor }}">{{ b.sub }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;border:1px solid rgba(30,26,21,.14);border-radius:10px;padding:0 12px;background:#FFFDF8">
+                <span style="font-size:13px;color:#6E655A">R$</span>
+                <input value="{{ b.value }}" onChange="{{ b.onChange }}" inputmode="numeric" style="all:unset;width:72px;padding:10px 0;text-align:right;font-family:'Geist Mono',monospace;font-size:14.5px">
+              </div>
+            </div>
+          </sc-for>
+        </section>
+        <section style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:6px 2px">
+          <span style="font-size:13px;color:#6E655A;flex:1 1 200px">Dados salvos neste navegador.</span>
+          <button onClick="{{ resetSample }}" style="all:unset;cursor:pointer;padding:10px 14px;border-radius:10px;border:1px solid rgba(30,26,21,.16);font-size:13.5px" style-hover="background:rgba(30,26,21,.05)">Restaurar exemplo</button>
+          <button onClick="{{ clearAll }}" style="all:unset;cursor:pointer;padding:10px 14px;border-radius:10px;border:1px solid oklch(0.55 0.18 25 / 0.4);color:oklch(0.50 0.18 25);font-size:13.5px" style-hover="background:oklch(0.55 0.18 25 / 0.08)">{{ clearLabel }}</button>
+        </section>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ openNew }}" aria-label="Novo gasto" style="all:unset;cursor:pointer;position:fixed;right:18px;bottom:88px;width:60px;height:60px;border-radius:50%;background:#1E1A15;color:#FBF8F1;display:grid;place-items:center;font-size:30px;line-height:1;box-shadow:0 8px 24px rgba(30,26,21,.28);z-index:20">+</button>
+    <nav style="position:fixed;left:0;right:0;bottom:0;display:flex;background:#FBF8F1;border-top:1px solid rgba(30,26,21,.12);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:20">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+        <button onClick="{{ n.onClick }}" style="all:unset;cursor:pointer;flex:1;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:13px;font-weight:500;color:{{ n.tabFg }}">
+          <span style="width:18px;height:3px;border-radius:2px;background:{{ n.tabBar }}"></span>{{ n.label }}
+        </button>
+      </sc-for>
+    </nav>
+  </sc-if>
+
+  <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeSheet }}" style="position:fixed;inset:0;background:rgba(30,26,21,.42);display:flex;justify-content:center;align-items:{{ sheetAlign }};z-index:50;padding:{{ sheetOuterPad }}">
+      <div onClick="{{ stop }}" style="width:100%;max-width:540px;max-height:94vh;overflow:auto;background:#FBF8F1;border-radius:{{ sheetRadius }};padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 20px 60px rgba(30,26,21,.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Instrument Serif',serif;font-size:32px;line-height:1">{{ sheetTitle }}</div>
+          <button onClick="{{ closeSheet }}" aria-label="Fechar" style="all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:#6E655A" style-hover="background:rgba(30,26,21,.07)">×</button>
+        </div>
+
+        <div style="display:flex;align-items:baseline;gap:10px;border-bottom:2px solid #1E1A15;padding-bottom:6px">
+          <span style="font-family:'Instrument Serif',serif;font-size:34px;color:#6E655A">R$</span>
+          <input value="{{ form.amount }}" onChange="{{ onAmount }}" inputmode="decimal" placeholder="0,00" autofocus style="all:unset;flex:1;min-width:0;font-family:'Instrument Serif',serif;font-size:58px;line-height:1.05;color:#1E1A15">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Quem gastou</div>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ whoOpts }}" as="o" hint-placeholder-count="2">
+              <button onClick="{{ o.onClick }}" style="all:unset;cursor:pointer;flex:1;min-height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:9px;font-size:15px;font-weight:500;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">
+                <span style="width:10px;height:10px;border-radius:50%;background:{{ o.dot }}"></span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">O quê</div>
+          <input value="{{ form.desc }}" onChange="{{ onDesc }}" placeholder="ex: Jantar de sexta" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(30,26,21,.14);background:#FFFDF8;font-size:15px;color:#1E1A15">
+          <input value="{{ form.place }}" onChange="{{ onPlace }}" placeholder="Local (opcional) — ex: Padaria Real" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(30,26,21,.14);background:#FFFDF8;font-size:15px;color:#1E1A15">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Categoria</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ catOpts }}" as="o" hint-placeholder-count="11">
+              <button onClick="{{ o.onClick }}" style="all:unset;cursor:pointer;padding:9px 12px;border-radius:999px;font-size:14px;display:flex;align-items:center;gap:7px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">
+                <span style="width:8px;height:8px;border-radius:3px;background:{{ o.dot }}"></span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:16px">
+          <div style="flex:1 1 160px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Quando</div>
+            <input type="date" value="{{ form.date }}" onChange="{{ onDate }}" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(30,26,21,.14);background:#FFFDF8;font-size:15px;color:#1E1A15">
+          </div>
+          <div style="flex:2 1 260px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6E655A">Pagamento</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ payOpts }}" as="o" hint-placeholder-count="5">
+                <button onClick="{{ o.onClick }}" style="all:unset;cursor:pointer;padding:10px 12px;border-radius:10px;font-size:13.5px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ hasError }}">
+          <div style="font-size:14px;color:oklch(0.50 0.18 25)">{{ sheetError }}</div>
+        </sc-if>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <sc-if value="{{ isEdit }}">
+            <button onClick="{{ deleteExp }}" style="all:unset;cursor:pointer;padding:14px 16px;border-radius:12px;font-size:14.5px;color:oklch(0.50 0.18 25)" style-hover="background:oklch(0.55 0.18 25 / 0.08)">{{ deleteLabel }}</button>
+          </sc-if>
+          <button onClick="{{ saveExp }}" style="all:unset;cursor:pointer;margin-left:auto;background:#1E1A15;color:#FBF8F1;padding:15px 26px;border-radius:12px;font-size:15.5px;font-weight:500;text-align:center" style-hover="background:oklch(0.60 0.15 38)">Salvar gasto</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ contribOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeContrib }}" style="position:fixed;inset:0;background:rgba(30,26,21,.42);display:flex;justify-content:center;align-items:{{ sheetAlign }};z-index:50;padding:{{ sheetOuterPad }}">
+      <div onClick="{{ stop }}" style="width:100%;max-width:440px;background:#FBF8F1;border-radius:{{ sheetRadius }};padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:0 20px 60px rgba(30,26,21,.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1">Conta do casal</div>
+          <button onClick="{{ closeContrib }}" aria-label="Fechar" style="all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:#6E655A" style-hover="background:rgba(30,26,21,.07)">×</button>
+        </div>
+        <div style="font-size:14px;color:#6E655A;text-wrap:pretty">Depósito mensal de cada um. Vale a partir de {{ monthLabel }}.</div>
+        <sc-for list="{{ contribRows }}" as="c" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ c.color }}"></span>
+            <span style="flex:1;font-size:15px;font-weight:500">{{ c.name }}</span>
+            <div style="display:flex;align-items:center;gap:6px;border:1px solid rgba(30,26,21,.14);border-radius:10px;padding:0 12px;background:#FFFDF8">
+              <span style="font-size:13px;color:#6E655A">R$</span>
+              <input value="{{ c.value }}" onChange="{{ c.onChange }}" inputmode="numeric" style="all:unset;width:90px;padding:12px 0;text-align:right;font-family:'Geist Mono',monospace;font-size:15px">
+            </div>
+          </div>
+        </sc-for>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid rgba(30,26,21,.14);padding-top:14px">
+          <span style="font-size:14px;color:#6E655A">Total na conta</span>
+          <span style="font-family:'Instrument Serif',serif;font-size:30px">{{ contribTotalF }}</span>
+        </div>
+        <button onClick="{{ saveContrib }}" style="all:unset;cursor:pointer;background:#1E1A15;color:#FBF8F1;padding:15px 26px;border-radius:12px;font-size:15.5px;font-weight:500;text-align:center" style-hover="background:oklch(0.60 0.15 38)">Salvar valor</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}">
+    <div style="position:fixed;left:50%;transform:translateX(-50%);bottom:{{ toastBottom }};background:#1E1A15;color:#FBF8F1;padding:12px 18px;border-radius:999px;font-size:14px;z-index:60;box-shadow:0 8px 24px rgba(30,26,21,.25)">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCents&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Exibição&quot;},&quot;dailyMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pessoa&quot;,&quot;total&quot;],&quot;default&quot;:&quot;pessoa&quot;,&quot;tsType&quot;:&quot;'pessoa' | 'total'&quot;,&quot;section&quot;:&quot;Exibição&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;painel&quot;,&quot;gastos&quot;],&quot;default&quot;:&quot;painel&quot;,&quot;tsType&quot;:&quot;'painel' | 'gastos'&quot;,&quot;section&quot;:&quot;Exibição&quot;}}">
+const KEY = 'enddy-bento-gastos-v1';
+const CATS = [
+  { id: 'comida', name: 'Comida', color: 'oklch(0.66 0.13 60)' },
+  { id: 'mercado', name: 'Mercado', color: 'oklch(0.58 0.11 145)' },
+  { id: 'transporte', name: 'Transporte', color: 'oklch(0.56 0.11 260)' },
+  { id: 'lazer', name: 'Lazer', color: 'oklch(0.58 0.14 340)' },
+  { id: 'viagem', name: 'Viagem', color: 'oklch(0.60 0.09 195)' },
+  { id: 'moradia', name: 'Moradia', color: 'oklch(0.42 0.04 60)' },
+  { id: 'contas', name: 'Contas', color: 'oklch(0.70 0.12 90)' },
+  { id: 'saude', name: 'Saúde', color: 'oklch(0.58 0.16 18)' },
+  { id: 'presentes', name: 'Presentes', color: 'oklch(0.56 0.13 300)' },
+  { id: 'pets', name: 'Pets', color: 'oklch(0.55 0.09 115)' },
+  { id: 'outros', name: 'Outros', color: 'oklch(0.62 0.02 70)' },
+];
+const CATMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
+const PEOPLE = {
+  enddy: { name: 'Enddy', color: 'oklch(0.60 0.15 38)', soft: 'oklch(0.60 0.15 38 / 0.13)' },
+  bento: { name: 'Bento', color: 'oklch(0.42 0.07 230)', soft: 'oklch(0.42 0.07 230 / 0.13)' },
+  casal: { name: 'Casal', color: 'oklch(0.55 0.10 160)', soft: 'oklch(0.55 0.10 160 / 0.14)' },
+};
+const DEFAULT_CONTRIB = { enddy: 2500, bento: 2000 };
+const PAYS = ['Crédito', 'Débito', 'Pix', 'Dinheiro', 'VR/VA'];
+const DEFAULT_BUDGETS = { comida: 1200, mercado: 1500, transporte: 600, lazer: 500, viagem: 1000, moradia: 3500, contas: 450, saude: 300, presentes: 250, pets: 400, outros: 300 };
+const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const MSHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const WD = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const pad = n => String(n).padStart(2, '0');
+const mk = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+const iso = (y, m0, d) => `${y}-${pad(m0 + 1)}-${pad(d)}`;
+const shiftKey = (k, n) => { const [y, m] = k.split('-').map(Number); return mk(new Date(y, m - 1 + n, 1)); };
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+function seedData() {
+  let s = 20261003;
+  const r = () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; };
+  const pick = a => a[Math.floor(r() * a.length)];
+  const T = {
+    comida: [['Jantar', 'Coco Bambu', 140, 280], ['Almoço', 'Sabor da Vila', 45, 95], ['iFood', 'Delivery', 40, 115], ['Pizza', 'Bráz Pizzaria', 95, 170], ['Café da manhã', 'Padaria Real', 25, 60], ['Hambúrguer', 'Madero', 80, 150], ['Sushi', 'Temakeria', 90, 190]],
+    mercado: [['Compras da semana', 'Pão de Açúcar', 190, 430], ['Hortifruti', 'Oba Hortifruti', 50, 130], ['Mercadinho', 'Carrefour Express', 30, 95]],
+    transporte: [['Uber', 'Uber', 14, 48], ['99', '99', 12, 42], ['Gasolina', 'Posto Shell', 160, 260], ['Estacionamento', 'Shopping', 15, 35]],
+    lazer: [['Cinema', 'Cinemark', 60, 110], ['Bar', 'Bar do Zé', 70, 190], ['Show', 'Ingresso.com', 160, 380], ['Livraria', 'Livraria Cultura', 50, 140]],
+    saude: [['Farmácia', 'Drogasil', 30, 160], ['Consulta', 'Clínica Vida', 220, 350]],
+    presentes: [['Presente de aniversário', 'Shopping', 90, 300], ['Flores', 'Floricultura', 60, 140]],
+    pets: [['Ração', 'Petz', 150, 230], ['Banho e tosa', 'Pet Shop', 70, 110], ['Veterinário', 'Clínica Vet', 180, 320]],
+    outros: [['Utilidades de casa', 'Leroy Merlin', 40, 200], ['Lavanderia', '5àSec', 40, 90]],
+    viagem: [['Hotel', 'Booking', 600, 1300], ['Passagem', 'Gol', 400, 1000], ['Airbnb', 'Airbnb', 500, 1100]],
+  };
+  const W = [['comida', 14], ['mercado', 6], ['transporte', 12], ['lazer', 3], ['saude', 2], ['pets', 2], ['outros', 2], ['presentes', 1]];
+  const WT = W.reduce((a, w) => a + w[1], 0);
+  const wpick = () => { let x = r() * WT; for (const [c, w] of W) { if ((x -= w) < 0) return c; } return 'outros'; };
+  const out = []; const now = new Date();
+  for (let m = 5; m >= 0; m--) {
+    const d0 = new Date(now.getFullYear(), now.getMonth() - m, 1);
+    const y = d0.getFullYear(), mo = d0.getMonth();
+    const dim = new Date(y, mo + 1, 0).getDate();
+    const last = m === 0 ? now.getDate() : dim;
+    const add = (day, cat, desc, place, amount, who, pay) => { if (day > last) return; out.push({ id: uid(), amount: Math.round(amount * 100) / 100, desc, place, cat, who, pay, date: iso(y, mo, day) }); };
+    add(5, 'moradia', 'Aluguel', 'Imobiliária', 2800, 'casal', 'Pix');
+    add(10, 'moradia', 'Condomínio', 'Condomínio', 640, 'casal', 'Pix');
+    add(12, 'contas', 'Luz', 'Enel', 150 + r() * 70, 'casal', 'Débito');
+    add(15, 'contas', 'Internet', 'Vivo Fibra', 119.9, 'casal', 'Débito');
+    add(18, 'contas', 'Água', 'Sabesp', 70 + r() * 40, 'casal', 'Débito');
+    add(8, 'lazer', 'Streaming', 'Netflix', 55.9, 'enddy', 'Crédito');
+    const n = Math.max(3, Math.round((36 + r() * 12) * last / dim));
+    for (let i = 0; i < n; i++) {
+      const cat = wpick(); const [desc, place, lo, hi] = pick(T[cat]);
+      const who = r() < 0.2 ? 'casal' : r() < 0.52 ? 'enddy' : 'bento';
+      let pay = pick(['Crédito', 'Crédito', 'Pix', 'Débito', 'Crédito', 'Dinheiro']);
+      if ((cat === 'comida' || cat === 'mercado') && r() < 0.3) pay = 'VR/VA';
+      if (desc === 'Uber' || desc === '99') pay = 'Crédito';
+      add(1 + Math.floor(r() * last), cat, desc, place, lo + r() * (hi - lo), who, pay);
+    }
+    if (m === 2 || m === 4) {
+      const [d1, p1, l1, h1] = T.viagem[1]; add(20, 'viagem', d1, p1, l1 + r() * (h1 - l1), 'bento', 'Crédito');
+      const [d2, p2, l2, h2] = pick([T.viagem[0], T.viagem[2]]); add(22, 'viagem', d2, p2, l2 + r() * (h2 - l2), 'enddy', 'Crédito');
+    }
+  }
+  return out;
+}
+
+class Component extends DCLogic {
+  state = this.init();
+
+  init() {
+    let data = null;
+    try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+    const now = new Date();
+    const start = this.props && this.props.startScreen === 'gastos' ? 'gastos' : 'painel';
+    let expenses = (data && data.expenses) || seedData();
+    if (data && !data.v) { const FIX = ['Aluguel', 'Condomínio', 'Luz', 'Água', 'Internet']; expenses = expenses.map(e => FIX.includes(e.desc) ? { ...e, who: 'casal' } : e); }
+    return {
+      screen: start, monthKey: mk(now), expenses,
+      contribs: (data && data.contribs) || { '0000-00': { ...DEFAULT_CONTRIB } }, contribSheet: null,
+      budgets: (data && data.budgets) || { ...DEFAULT_BUDGETS },
+      sheet: null, fWho: 'all', fCat: 'all', q: '', hoverDay: null, toast: null, confirmClear: false,
+      isMobile: typeof window !== 'undefined' && window.innerWidth < 820,
+    };
+  }
+
+  componentDidMount() {
+    this.onResize = () => { const m = window.innerWidth < 820; if (m !== this.state.isMobile) this.setState({ isMobile: m }); };
+    window.addEventListener('resize', this.onResize);
+    this.onKey = e => { if (e.key === 'Escape') this.setState({ sheet: null, contribSheet: null }); };
+    window.addEventListener('keydown', this.onKey);
+    this.persist({});
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('keydown', this.onKey); }
+
+  persist(patch) {
+    const d = { v: 2, expenses: patch.expenses || this.state.expenses, budgets: patch.budgets || this.state.budgets, contribs: patch.contribs || this.state.contribs };
+    try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {}
+    this.setState(patch);
+  }
+  contribFor(k) {
+    const c = this.state.contribs; const key = Object.keys(c).filter(x => x <= k).sort().pop();
+    return key ? c[key] : DEFAULT_CONTRIB;
+  }
+  flash(msg) { clearTimeout(this.tt); this.setState({ toast: msg }); this.tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+
+  openNew = () => {
+    const now = new Date(); const isCur = this.state.monthKey === mk(now);
+    const last = this.state.expenses[this.state.expenses.length - 1];
+    this.setState({ sheet: { mode: 'new', error: '', confirmDel: false, form: { amount: '', desc: '', place: '', who: last ? last.who : 'enddy', cat: 'comida', pay: 'Crédito', date: isCur ? iso(now.getFullYear(), now.getMonth(), now.getDate()) : this.state.monthKey + '-01' } } });
+  };
+  openEdit = e => {
+    this.setState({ sheet: { mode: 'edit', id: e.id, error: '', confirmDel: false, form: { amount: e.amount.toFixed(2).replace('.', ','), desc: e.desc, place: e.place || '', who: e.who, cat: e.cat, pay: e.pay, date: e.date } } });
+  };
+  setForm(p) { this.setState(s => ({ sheet: { ...s.sheet, error: '', form: { ...s.sheet.form, ...p } } })); }
+  parseAmount(str) {
+    let t = String(str).trim().replace(/[^\d.,]/g, '');
+    if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+    const v = parseFloat(t); return isFinite(v) ? Math.round(v * 100) / 100 : 0;
+  }
+  saveExp = () => {
+    const sh = this.state.sheet, f = sh.form;
+    const amount = this.parseAmount(f.amount);
+    if (!(amount > 0)) return this.setState({ sheet: { ...sh, error: 'Informe um valor maior que zero.' } });
+    if (!f.desc.trim()) return this.setState({ sheet: { ...sh, error: 'Descreva o gasto (ex: Jantar, Uber, Mercado).' } });
+    if (!f.date) return this.setState({ sheet: { ...sh, error: 'Escolha a data.' } });
+    const rec = { id: sh.id || uid(), amount, desc: f.desc.trim(), place: f.place.trim(), who: f.who, cat: f.cat, pay: f.pay, date: f.date };
+    const expenses = sh.mode === 'edit' ? this.state.expenses.map(e => e.id === sh.id ? rec : e) : [...this.state.expenses, rec];
+    this.persist({ expenses, sheet: null, monthKey: f.date.slice(0, 7) });
+    this.flash(sh.mode === 'edit' ? 'Gasto atualizado' : 'Gasto salvo');
+  };
+  deleteExp = () => {
+    const sh = this.state.sheet;
+    if (!sh.confirmDel) return this.setState({ sheet: { ...sh, confirmDel: true } });
+    this.persist({ expenses: this.state.expenses.filter(e => e.id !== sh.id), sheet: null });
+    this.flash('Gasto excluído');
+  };
+
+  renderVals() {
+    const s = this.state, P = this.props || {};
+    const cents = P.showCents ?? true;
+    const dailyMode = P.dailyMode || 'pessoa';
+    const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 });
+    const short = v => v >= 1000 ? 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' : 'R$ ' + Math.round(v);
+    const sum = a => a.reduce((t, e) => t + e.amount, 0);
+    const now = new Date(); const curKey = mk(now); const isCur = s.monthKey === curKey;
+    const [Y, M] = s.monthKey.split('-').map(Number);
+    const dim = new Date(Y, M, 0).getDate();
+    const inMonth = k => s.expenses.filter(e => e.date.slice(0, 7) === k);
+    const mex = inMonth(s.monthKey);
+    const total = sum(mex);
+    const eT = sum(mex.filter(e => e.who === 'enddy')), bT = sum(mex.filter(e => e.who === 'bento'));
+    const eN = mex.filter(e => e.who === 'enddy').length, bN = mex.filter(e => e.who === 'bento').length;
+    const cT = sum(mex.filter(e => e.who === 'casal')), cN = mex.filter(e => e.who === 'casal').length;
+    const contrib = this.contribFor(s.monthKey); const dep = (+contrib.enddy || 0) + (+contrib.bento || 0);
+    const cOver = cT > dep;
+    const casal = {
+      depF: fmt(dep), split: `Enddy ${fmt(+contrib.enddy || 0)} + Bento ${fmt(+contrib.bento || 0)}`,
+      usedW: (dep ? Math.min(cT / dep * 100, 100) : 0) + '%', barColor: cOver ? 'oklch(0.65 0.18 28)' : 'oklch(0.78 0.10 160)',
+      label: `Conta do casal · ${MONTHS[M - 1]}`, usedText: `Usado ${fmt(cT)} (${dep ? (cT / dep * 100).toFixed(0) : 0}%)`, leftText: cOver ? `Passou ${fmt(cT - dep)}` : `Sobra ${fmt(dep - cT)}`,
+    };
+    const monthName = MONTHS[M - 1];
+    const dayLbl = d => { const dt = new Date(d + 'T12:00:00'); return `${dt.getDate()} ${MSHORT[dt.getMonth()]}`; };
+
+    // comparison
+    const prevKey = shiftKey(s.monthKey, -1); const PM = +prevKey.split('-')[1];
+    let prevEx = inMonth(prevKey); let prevLabel = MONTHS[PM - 1];
+    if (isCur) { const d = now.getDate(); prevEx = prevEx.filter(e => +e.date.slice(8) <= d); prevLabel += ` até dia ${d}`; }
+    const prevT = sum(prevEx);
+    let deltaText = 'Sem mês anterior para comparar', deltaBg = 'rgba(251,248,241,.1)', deltaFg = 'rgba(251,248,241,.8)';
+    if (prevT > 0) {
+      const dp = (total - prevT) / prevT * 100;
+      const up = dp >= 0;
+      deltaText = `${up ? '▲' : '▼'} ${Math.abs(dp).toFixed(0)}% vs. ${prevLabel}`;
+      deltaBg = up ? 'oklch(0.60 0.15 38 / 0.28)' : 'oklch(0.62 0.11 150 / 0.28)';
+      deltaFg = up ? 'oklch(0.86 0.08 45)' : 'oklch(0.88 0.08 150)';
+    }
+    const budgetTotal = Object.values(s.budgets).reduce((a, b) => a + (+b || 0), 0);
+    const budPct = budgetTotal ? total / budgetTotal * 100 : 0;
+    const over = total > budgetTotal && budgetTotal > 0;
+    const hero = {
+      label: `Total de ${monthName}`, totalF: fmt(total), deltaText, deltaBg, deltaFg,
+      budW: Math.min(budPct, 100) + '%', budColor: over ? 'oklch(0.65 0.18 28)' : budPct > 85 ? 'oklch(0.78 0.13 75)' : '#FBF8F1',
+      budText: `${budPct.toFixed(0)}% de ${short(budgetTotal)} orçados`,
+      restText: over ? `Passou ${fmt(total - budgetTotal)}` : `Restam ${fmt(budgetTotal - total)}`,
+    };
+
+    // who
+    const pc = v => total ? v / total * 100 : 0;
+    const ePct = total ? eT / total * 100 : 50;
+    const diff = Math.abs(eT - bT);
+    const who = {
+      eW: pc(eT) + '%', bW: pc(bT) + '%', cW: pc(cT) + '%',
+      rows: [
+        { name: 'Enddy', color: PEOPLE.enddy.color, amountF: fmt(eT), sub: `${eN} gasto${eN === 1 ? '' : 's'} · ${pc(eT).toFixed(0)}%` },
+        { name: 'Bento', color: PEOPLE.bento.color, amountF: fmt(bT), sub: `${bN} gasto${bN === 1 ? '' : 's'} · ${pc(bT).toFixed(0)}%` },
+        { name: 'Casal', color: PEOPLE.casal.color, amountF: fmt(cT), sub: `conta conjunta · ${cN} gasto${cN === 1 ? '' : 's'} · ${pc(cT).toFixed(0)}%` },
+      ],
+      diffText: !total ? 'Nenhum gasto registrado ainda.' : diff < 1 ? 'Empatados neste mês.' : `${eT > bT ? 'Enddy' : 'Bento'} gastou ${fmt(diff)} a mais que ${eT > bT ? 'Bento' : 'Enddy'}.`,
+    };
+
+    // daily
+    const dE = Array(dim + 1).fill(0), dB = Array(dim + 1).fill(0), dC = Array(dim + 1).fill(0);
+    mex.forEach(e => { const d = +e.date.slice(8); (e.who === 'enddy' ? dE : e.who === 'casal' ? dC : dB)[d] += e.amount; });
+    const tots = []; for (let d = 1; d <= dim; d++) tots.push(dE[d] + dB[d] + dC[d]);
+    const sorted = [...tots].sort((a, b) => b - a);
+    let cap = sorted[0] || 1;
+    if (sorted[1] && sorted[0] > sorted[1] * 2.2) cap = sorted[1] * 1.3;
+    const todayD = isCur ? now.getDate() : dim;
+    const daily = [];
+    for (let d = 1; d <= dim; d++) {
+      const t = dE[d] + dB[d] + dC[d]; const k = Math.min(t, cap) / cap * 100;
+      const hE = t ? k * dE[d] / t : 0, hB = t ? k * dB[d] / t : 0, hC = t ? k * dC[d] / t : 0;
+      const future = isCur && d > todayD; const hov = s.hoverDay === d;
+      daily.push({
+        hE: hE + '%', hB: hB + '%', hC: hC + '%', cC: dailyMode === 'total' ? '#1E1A15' : PEOPLE.casal.color,
+        cE: dailyMode === 'total' ? '#1E1A15' : PEOPLE.enddy.color, cB: dailyMode === 'total' ? '#1E1A15' : PEOPLE.bento.color,
+        clipped: t > cap, clipLabel: short(t),
+        bg: hov ? 'rgba(30,26,21,.07)' : future ? 'repeating-linear-gradient(135deg, rgba(30,26,21,.04) 0 4px, transparent 4px 8px)' : 'transparent',
+        label: (d === 1 || d % 5 === 0 || (isCur && d === todayD)) ? String(d) : '',
+        labelColor: isCur && d === todayD ? PEOPLE.enddy.color : '#6E655A',
+        title: `${d}/${pad(M)} — ${fmt(t)}`,
+        onEnter: () => this.state.hoverDay !== d && this.setState({ hoverDay: d }),
+      });
+    }
+    const avg = total / Math.max(1, todayD);
+    const hd = s.hoverDay;
+    const dailyInfo = hd && hd <= dim ? `${hd} de ${monthName} · Enddy ${fmt(dE[hd])} · Bento ${fmt(dB[hd])} · Casal ${fmt(dC[hd])}` : `Média de ${fmt(avg)} por dia`;
+
+    // categories
+    const cats = CATS.map(c => {
+      const spent = sum(mex.filter(e => e.cat === c.id)); const bud = +s.budgets[c.id] || 0;
+      const ov = bud > 0 && spent > bud;
+      return {
+        id: c.id, name: c.name, color: c.color, spent, spentF: fmt(spent),
+        w: (bud ? Math.min(spent / bud * 100, 100) : spent > 0 ? 100 : 0) + '%',
+        barColor: ov ? 'oklch(0.58 0.19 27)' : c.color,
+        sub: ov ? `+${short(spent - bud)}` : bud ? `de ${short(bud)}` : 'sem limite',
+        subColor: ov ? 'oklch(0.50 0.18 25)' : '#6E655A',
+        opacity: spent > 0 ? 1 : 0.55,
+      };
+    }).sort((a, b) => b.spent - a.spent);
+
+    // months
+    const mrows = [];
+    for (let i = 5; i >= 0; i--) {
+      const k = shiftKey(s.monthKey, -i); const ex = inMonth(k);
+      const e = sum(ex.filter(x => x.who === 'enddy')), b = sum(ex.filter(x => x.who === 'bento')), c = sum(ex.filter(x => x.who === 'casal'));
+      mrows.push({ k, e, b, c, t: e + b + c });
+    }
+    const mMax = Math.max(1, ...mrows.map(r => r.t));
+    const months = mrows.map(r => ({
+      label: MSHORT[+r.k.split('-')[1] - 1], valueF: r.t ? short(r.t) : '—',
+      h: Math.max(r.t / mMax * 100 * 0.78, r.t ? 3 : 0) + '%', fE: r.e || 0, fB: r.b || 0, fC: r.c || 0,
+      opacity: r.k === s.monthKey ? 1 : 0.5, weight: r.k === s.monthKey ? 600 : 400,
+      title: `${MONTHS[+r.k.split('-')[1] - 1]}: Enddy ${fmt(r.e)} · Bento ${fmt(r.b)} · Casal ${fmt(r.c)}`,
+      onClick: () => this.setState({ monthKey: r.k, hoverDay: null }),
+    }));
+
+    const top = [...mex].sort((a, b) => b.amount - a.amount).slice(0, 5).map((e, i) => ({
+      rank: i + 1, desc: e.desc, amountF: fmt(e.amount), whoColor: PEOPLE[e.who].color,
+      meta: `${PEOPLE[e.who].name} · ${dayLbl(e.date)} · ${CATMAP[e.cat].name}`, onClick: () => this.openEdit(e),
+    }));
+
+    // list
+    const q = s.q.trim().toLowerCase();
+    const filtered = mex.filter(e => (s.fWho === 'all' || e.who === s.fWho) && (s.fCat === 'all' || e.cat === s.fCat) && (!q || (e.desc + ' ' + (e.place || '')).toLowerCase().includes(q)))
+      .sort((a, b) => b.date.localeCompare(a.date) || b.amount - a.amount);
+    const gmap = {};
+    filtered.forEach(e => { (gmap[e.date] = gmap[e.date] || []).push(e); });
+    const groups = Object.keys(gmap).sort().reverse().map(d => {
+      const dt = new Date(d + 'T12:00:00');
+      return {
+        label: `${WD[dt.getDay()]}, ${dt.getDate()} de ${MONTHS[dt.getMonth()]}`, totalF: fmt(sum(gmap[d])),
+        items: gmap[d].map((e, i) => {
+          const c = CATMAP[e.cat] || CATMAP.outros, p = PEOPLE[e.who];
+          return {
+            desc: e.desc, meta: [c.name, e.place, e.pay].filter(Boolean).join(' · '), amountF: fmt(e.amount),
+            catInitial: c.name[0], catColor: c.color, catSoft: c.color.replace(')', ' / 0.14)'),
+            whoName: p.name, whoColor: p.color, whoSoft: p.soft,
+            border: i ? '1px solid rgba(30,26,21,.08)' : 'none', onClick: () => this.openEdit(e),
+          };
+        }),
+      };
+    });
+    const sel = (on, color) => ({ bg: on ? '#1E1A15' : 'transparent', fg: on ? '#FBF8F1' : '#1E1A15', border: on ? '#1E1A15' : 'rgba(30,26,21,.14)', dot: color });
+    const whoFilters = [['all', 'Todos', 'rgba(30,26,21,.3)'], ['enddy', 'Enddy', PEOPLE.enddy.color], ['bento', 'Bento', PEOPLE.bento.color], ['casal', 'Casal', PEOPLE.casal.color]]
+      .map(([id, label, dot]) => ({ label, ...sel(s.fWho === id, dot), onClick: () => this.setState({ fWho: id }) }));
+    const catFilters = [{ id: 'all', name: 'Todas', color: 'rgba(30,26,21,.3)' }, ...CATS]
+      .map(c => ({ label: c.name, ...sel(s.fCat === c.id, c.color), onClick: () => this.setState({ fCat: c.id }) }));
+
+    // budget rows
+    const budgetRows = CATS.map((c, i) => {
+      const spent = sum(mex.filter(e => e.cat === c.id)); const bud = +s.budgets[c.id] || 0; const ov = bud > 0 && spent > bud;
+      return {
+        name: c.name, color: c.color, value: String(bud || ''), border: i ? '1px solid rgba(30,26,21,.08)' : 'none',
+        sub: ov ? `${fmt(spent)} gastos · passou ${fmt(spent - bud)}` : `${fmt(spent)} gastos em ${monthName}`,
+        subColor: ov ? 'oklch(0.50 0.18 25)' : '#6E655A',
+        onChange: ev => { const v = parseInt(String(ev.target.value).replace(/\D/g, ''), 10) || 0; this.persist({ budgets: { ...this.state.budgets, [c.id]: v } }); },
+      };
+    });
+
+    // sheet
+    const sh = s.sheet; const f = sh ? sh.form : {};
+    const whoOpts = ['enddy', 'bento', 'casal'].map(id => {
+      const on = f.who === id, p = PEOPLE[id];
+      return { label: p.name, dot: p.color, border: on ? p.color : 'rgba(30,26,21,.14)', bg: on ? p.soft : '#FFFDF8', fg: '#1E1A15', onClick: () => this.setForm({ who: id }) };
+    });
+    const catOpts = CATS.map(c => ({ label: c.name, ...sel(f.cat === c.id, c.color), onClick: () => this.setForm({ cat: c.id }) }));
+    const payOpts = PAYS.map(p => ({ label: p, ...sel(f.pay === p), onClick: () => this.setForm({ pay: p }) }));
+
+    const nav = [['painel', 'Painel'], ['gastos', 'Gastos'], ['orcamento', 'Orçamento']].map(([id, label]) => {
+      const on = s.screen === id;
+      return {
+        label, hint: id === 'gastos' ? String(mex.length) : '',
+        bg: on ? 'rgba(30,26,21,.08)' : 'transparent', fg: '#1E1A15',
+        tabFg: on ? '#1E1A15' : '#6E655A', tabBar: on ? PEOPLE.enddy.color : 'transparent',
+        onClick: () => this.setState({ screen: id }),
+      };
+    });
+
+    return {
+      isMobile: s.isMobile, isDesktop: !s.isMobile,
+      mainPadBottom: s.isMobile ? '120px' : '56px', barGap: s.isMobile ? '2px' : '4px',
+      nav, openNew: this.openNew,
+      screenTitle: { painel: 'Painel', gastos: 'Gastos', orcamento: 'Orçamento' }[s.screen],
+      isPainel: s.screen === 'painel', isGastos: s.screen === 'gastos', isOrcamento: s.screen === 'orcamento',
+      monthLabel: `${monthName} ${Y}`, monthName,
+      prevMonth: () => this.setState({ monthKey: shiftKey(s.monthKey, -1), hoverDay: null }),
+      nextMonth: () => { if (!isCur) this.setState({ monthKey: shiftKey(s.monthKey, 1), hoverDay: null }); },
+      nextOpacity: isCur ? 0.25 : 1,
+      hero, casal, who, daily,
+      contribOpen: !!s.contribSheet,
+      openContrib: () => this.setState({ contribSheet: { enddy: String(contrib.enddy), bento: String(contrib.bento) } }),
+      closeContrib: () => this.setState({ contribSheet: null }),
+      contribRows: s.contribSheet ? ['enddy', 'bento'].map(id => ({
+        name: PEOPLE[id].name, color: PEOPLE[id].color, value: s.contribSheet[id],
+        onChange: ev => { const v = String(ev.target.value).replace(/\D/g, ''); this.setState(st => ({ contribSheet: { ...st.contribSheet, [id]: v } })); },
+      })) : [],
+      contribTotalF: s.contribSheet ? fmt((+s.contribSheet.enddy || 0) + (+s.contribSheet.bento || 0)) : '',
+      saveContrib: () => {
+        const cs = s.contribSheet;
+        this.persist({ contribs: { ...s.contribs, [s.monthKey]: { enddy: +cs.enddy || 0, bento: +cs.bento || 0 } }, contribSheet: null });
+        this.flash('Valor da conta atualizado');
+      }, dailyInfo, clearHover: () => this.setState({ hoverDay: null }),
+      cats, months, top, noTop: top.length === 0,
+      goOrcamento: () => this.setState({ screen: 'orcamento' }),
+      whoFilters, catFilters, q: s.q, onQuery: e => this.setState({ q: e.target.value }),
+      groups, listEmpty: groups.length === 0,
+      emptyText: mex.length ? 'Nenhum gasto com esses filtros.' : `Nenhum gasto em ${monthName} ainda.`,
+      listSummary: `${filtered.length} gasto${filtered.length === 1 ? '' : 's'} em ${monthName}`, listTotalF: fmt(sum(filtered)),
+      budgetTotalF: fmt(budgetTotal), budgetRows,
+      resetSample: () => { this.persist({ expenses: seedData(), budgets: { ...DEFAULT_BUDGETS }, confirmClear: false }); this.flash('Dados de exemplo restaurados'); },
+      clearAll: () => {
+        if (!s.confirmClear) { this.setState({ confirmClear: true }); clearTimeout(this.ct); this.ct = setTimeout(() => this.setState({ confirmClear: false }), 3000); return; }
+        this.persist({ expenses: [], confirmClear: false }); this.flash('Todos os gastos apagados');
+      },
+      clearLabel: s.confirmClear ? 'Toque de novo para apagar' : 'Apagar todos os gastos',
+      sheetOpen: !!sh, form: f, isEdit: !!sh && sh.mode === 'edit',
+      sheetTitle: sh && sh.mode === 'edit' ? 'Editar gasto' : 'Novo gasto',
+      sheetAlign: s.isMobile ? 'flex-end' : 'center', sheetOuterPad: s.isMobile ? '0' : '24px', sheetRadius: s.isMobile ? '22px 22px 0 0' : '22px',
+      closeSheet: () => this.setState({ sheet: null }), stop: e => e.stopPropagation(),
+      onAmount: e => this.setForm({ amount: e.target.value }), onDesc: e => this.setForm({ desc: e.target.value }),
+      onPlace: e => this.setForm({ place: e.target.value }), onDate: e => this.setForm({ date: e.target.value }),
+      whoOpts, catOpts, payOpts,
+      hasError: !!(sh && sh.error), sheetError: sh ? sh.error : '',
+      saveExp: this.saveExp, deleteExp: this.deleteExp,
+      deleteLabel: sh && sh.confirmDel ? 'Confirmar exclusão' : 'Excluir',
+      hasToast: !!s.toast, toast: s.toast || '', toastBottom: s.isMobile ? '160px' : '32px',
+    };
+  }
+}
+</script>
+</body>
+</html>

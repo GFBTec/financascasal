@@ -1,0 +1,227 @@
+/* ---------- Conta do casal ---------- */
+.casal-card {
+  flex: 2 1 440px;
+  padding: clamp(22px, 3vw, 32px);
+  gap: 22px;
+}
+.casal-card__edit {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 248, 241, 0.3);
+  color: var(--card);
+}
+.casal-card__edit:hover {
+  background: rgba(251, 248, 241, 0.1);
+}
+.casal-card__value {
+  font-family: var(--font-serif);
+  font-size: clamp(52px, 8vw, 92px);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+}
+.casal-card__sub {
+  font-size: 14px;
+  color: var(--on-dark-muted);
+}
+
+/* ---------- Quem gastou ---------- */
+.who-card {
+  flex: 1 1 300px;
+}
+.who-card__bar {
+  display: flex;
+  height: 14px;
+  gap: 3px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(30, 26, 21, 0.06);
+}
+.who-card__bar > div {
+  border-radius: 99px;
+  transition: width 0.5s;
+}
+.who-card__value {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  line-height: 1;
+}
+.who-card__diff {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(30, 26, 21, 0.18);
+  font-size: 14px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+/* ---------- Evolução diária ---------- */
+.daily__bars,
+.daily__axis {
+  display: flex;
+  gap: 4px;
+}
+.daily__bars {
+  align-items: flex-end;
+  height: 190px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.daily__day {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1px;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+}
+.daily__day > div {
+  border-radius: 2px;
+  transition: height 0.4s;
+}
+.daily__day--future {
+  background: repeating-linear-gradient(135deg, rgba(30, 26, 21, 0.04) 0 4px, transparent 4px 8px);
+}
+.daily__day--hover {
+  background: rgba(30, 26, 21, 0.07);
+}
+.daily__clip {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.daily__axis > div {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.daily__axis > .is-today {
+  color: var(--enddy);
+}
+
+/* ---------- Por categoria ---------- */
+.cats-card {
+  flex: 1.4 1 420px;
+}
+.cat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.cat-row__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.cat-row__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+.cat-row__sub {
+  min-width: 92px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* ---------- Últimos 6 meses ---------- */
+.months__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 170px;
+}
+.months__bar {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  gap: 6px;
+  opacity: 0.5;
+}
+.months__bar:hover,
+.months__bar[aria-pressed='true'] {
+  opacity: 1;
+}
+.months__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: height 0.4s;
+}
+.months__stack > div {
+  border-radius: 2px;
+}
+.months__stack > div:first-child {
+  border-radius: 4px 4px 2px 2px;
+}
+.months__value {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.months__label {
+  text-align: center;
+  font-size: 12.5px;
+}
+.months__bar[aria-pressed='true'] .months__label {
+  font-weight: 600;
+}
+
+/* ---------- Maiores gastos ---------- */
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+}
+.top-item:hover {
+  background: rgba(30, 26, 21, 0.05);
+}
+.top-item__rank {
+  width: 18px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--muted);
+}
+.top-item__desc {
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-item__meta {
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 819.98px) {
+  .daily__bars,
+  .daily__axis {
+    gap: 2px;
+  }
+}

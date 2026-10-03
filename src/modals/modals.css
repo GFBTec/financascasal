@@ -1,0 +1,50 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.amount-field {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 6px;
+}
+.amount-field > span {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  color: var(--muted);
+}
+.amount-field > input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-serif);
+  font-size: 58px;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.who-option {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1.5px solid var(--line-strong);
+  background: var(--field);
+}
+
+.chip--lg {
+  padding: 9px 12px;
+  font-size: 14px;
+}
+.chip--pay {
+  padding: 10px 12px;
+  border-radius: 10px;
+}

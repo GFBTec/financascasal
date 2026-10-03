@@ -1,0 +1,37 @@
+/* Tokens visuais — seção 1 da especificação (docs/ESPECIFICACAO.md). */
+:root {
+  /* Superfícies e texto */
+  --bg: #f3eee4;
+  --card: #fbf8f1;
+  --field: #fffdf8;
+  --ink: #1e1a15;
+  --muted: #6e655a;
+  --line: rgba(30, 26, 21, 0.1);
+  --line-strong: rgba(30, 26, 21, 0.14);
+  --overlay: rgba(30, 26, 21, 0.42);
+  --on-dark-muted: rgba(251, 248, 241, 0.72);
+
+  /* Pessoas */
+  --enddy: oklch(0.6 0.15 38);
+  --bento: oklch(0.42 0.07 230);
+  --casal: oklch(0.55 0.1 160);
+  --casal-on-dark: oklch(0.78 0.1 160);
+
+  /* Estados */
+  --alert: oklch(0.58 0.19 27);
+  --alert-text: oklch(0.5 0.18 25);
+  --warn: oklch(0.78 0.13 75);
+
+  /* Tipografia */
+  --font-serif: 'Instrument Serif', serif;
+  --font-sans: 'Montserrat', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  /* Forma */
+  --radius-card: 20px;
+  --radius-group: 16px;
+  --radius-input: 12px;
+  --radius-modal: 22px;
+  --gap: 16px;
+  --sidebar-width: 248px;
+}

@@ -1,0 +1,256 @@
+/* Base + componentes compartilhados. Mobile = largura < 820px. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ink);
+}
+a:hover {
+  color: var(--enddy);
+}
+
+input,
+button {
+  font-family: inherit;
+}
+
+button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus {
+  outline: 2px solid oklch(0.6 0.15 38 / 0.5);
+  outline-offset: 1px;
+}
+
+::-webkit-scrollbar {
+  height: 6px;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 26, 21, 0.18);
+  border-radius: 4px;
+}
+
+/* ---------- Tipografia ---------- */
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.label--small {
+  font-size: 11px;
+}
+.label--on-dark {
+  color: var(--on-dark-muted);
+}
+.serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+.mono {
+  font-family: var(--font-mono);
+}
+.muted {
+  color: var(--muted);
+}
+
+/* ---------- Layout utilitário ---------- */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+.cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+
+/* ---------- Cartão ---------- */
+.card {
+  min-width: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.card--dark {
+  background: var(--ink);
+  color: var(--card);
+  border: none;
+}
+
+/* ---------- Botões ---------- */
+.btn-primary {
+  background: var(--ink);
+  color: var(--card);
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  transition: background 0.15s;
+}
+.btn-primary:hover {
+  background: var(--enddy);
+}
+.btn-outline {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(30, 26, 21, 0.16);
+  font-size: 13.5px;
+}
+.btn-outline:hover {
+  background: rgba(30, 26, 21, 0.05);
+}
+.btn-danger {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid oklch(0.55 0.18 25 / 0.4);
+  color: var(--alert-text);
+  font-size: 13.5px;
+}
+.btn-danger:hover {
+  background: oklch(0.55 0.18 25 / 0.08);
+}
+.btn-link {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn-link:hover {
+  color: var(--ink);
+}
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  color: var(--muted);
+}
+.icon-btn:hover {
+  background: rgba(30, 26, 21, 0.07);
+}
+
+/* ---------- Pontos de cor e legendas ---------- */
+.dot {
+  display: inline-block;
+  flex: none;
+  width: var(--dot-size, 8px);
+  height: var(--dot-size, 8px);
+  border-radius: 50%;
+}
+.dot--square {
+  border-radius: 3px;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Chips selecionáveis ---------- */
+.chip {
+  flex: none;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+}
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
+}
+
+/* ---------- Barra de progresso ---------- */
+.progress {
+  height: var(--progress-h, 6px);
+  border-radius: 99px;
+  background: var(--progress-track, rgba(30, 26, 21, 0.07));
+  overflow: hidden;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s;
+}
+
+/* ---------- Campos ---------- */
+.text-input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--line-strong);
+  background: var(--field);
+  font-size: 15px;
+  color: var(--ink);
+}
+.money-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--field);
+}
+.money-field > span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.money-field > input {
+  all: unset;
+  width: var(--money-w, 72px);
+  padding: 10px 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+}

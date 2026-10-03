@@ -1,0 +1,235 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  max-width: 1240px;
+  padding: clamp(18px, 3vw, 40px);
+  padding-bottom: 56px;
+}
+
+/* ---------- Marca ---------- */
+.brand {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.brand em {
+  color: var(--enddy);
+}
+.brand--small {
+  font-size: 20px;
+}
+
+/* ---------- Barra lateral (desktop) ---------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: none;
+  width: var(--sidebar-width);
+  height: 100vh;
+  padding: 32px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  border-right: 1px solid var(--line);
+}
+.sidebar__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 10px;
+}
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar__item {
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar__item:hover {
+  background: rgba(30, 26, 21, 0.06);
+}
+.sidebar__item[aria-current='page'] {
+  background: rgba(30, 26, 21, 0.08);
+}
+.sidebar__hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0.6;
+}
+.sidebar__new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sidebar__legend {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+/* ---------- Cabeçalho ---------- */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.page-header__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.page-header .brand--small {
+  display: none;
+}
+.page-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Seletor de mês ---------- */
+.month-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 4px;
+}
+.month-picker button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+.month-picker button:hover:not(:disabled) {
+  background: rgba(30, 26, 21, 0.07);
+}
+.month-picker button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.month-picker__label {
+  min-width: 132px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ---------- Abas inferiores + FAB (mobile) ---------- */
+.tabbar,
+.fab {
+  display: none;
+}
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  background: var(--card);
+  border-top: 1px solid var(--line-strong);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+}
+.tabbar__item {
+  flex: 1;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.tabbar__item::before {
+  content: '';
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+}
+.tabbar__item[aria-current='page'] {
+  color: var(--ink);
+}
+.tabbar__item[aria-current='page']::before {
+  background: var(--enddy);
+}
+.fab {
+  position: fixed;
+  right: 18px;
+  bottom: 88px;
+  z-index: 20;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--card);
+  place-items: center;
+  font-size: 30px;
+  line-height: 1;
+  box-shadow: 0 8px 24px rgba(30, 26, 21, 0.28);
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  z-index: 60;
+  background: var(--ink);
+  color: var(--card);
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(30, 26, 21, 0.25);
+}
+
+/* ---------- Mobile (< 820px) ---------- */
+@media (max-width: 819.98px) {
+  .sidebar {
+    display: none;
+  }
+  .main {
+    padding-bottom: 120px;
+  }
+  .page-header .brand--small {
+    display: block;
+  }
+  .tabbar {
+    display: flex;
+  }
+  .fab {
+    display: grid;
+  }
+  .toast {
+    bottom: 160px;
+  }
+}
