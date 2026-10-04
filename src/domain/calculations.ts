@@ -1,5 +1,14 @@
 import { CATEGORIES, DEFAULT_CONTRIBUTION } from './constants';
-import type { Budgets, Category, CategoryId, Contribution, Contributions, Expense, PersonId } from './types';
+import type {
+  Budgets,
+  Category,
+  CategoryId,
+  Contribution,
+  Contributions,
+  Expense,
+  ExpenseStatus,
+  PersonId,
+} from './types';
 import { dayOfISO, daysInMonth, monthKeyOfISO, shiftMonth } from '../lib/date';
 
 export const sumAmounts = (list: Expense[]) => list.reduce((t, e) => t + e.amount, 0);
@@ -109,7 +118,19 @@ export function lastMonths(all: Expense[], monthKey: string, count = 6): MonthTo
   return rows;
 }
 
-export const topExpenses = (list: Expense[], n = 5) => [...list].sort((a, b) => b.amount - a.amount).slice(0, n);
+export type StatusTotals = Record<ExpenseStatus, { total: number; count: number }>;
+
+/** Quantidade e valor de contas pagas e pendentes. */
+export function totalsByStatus(list: Expense[]): StatusTotals {
+  const r: StatusTotals = { pago: { total: 0, count: 0 }, pendente: { total: 0, count: 0 } };
+  for (const e of list) {
+    r[e.status].total += e.amount;
+    r[e.status].count += 1;
+  }
+  return r;
+}
+
+export const topExpenses =(list: Expense[], n = 5) => [...list].sort((a, b) => b.amount - a.amount).slice(0, n);
 
 export interface ExpenseFilter {
   who: PersonId | 'all';

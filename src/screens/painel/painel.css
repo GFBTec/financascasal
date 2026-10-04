@@ -137,6 +137,49 @@
   font-size: 12px;
 }
 
+/* ---------- Contas do mês (rosca pago × pendente) ---------- */
+.status-chart {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.status-chart svg {
+  flex: none;
+}
+.status-chart__value {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  fill: var(--ink);
+}
+.status-chart__caption {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--muted);
+}
+.status-chart__legend {
+  flex: 1 1 140px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.status-chart__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: opacity 0.15s;
+}
+.status-chart__summary {
+  padding-top: 14px;
+  border-top: 1px dashed rgba(30, 26, 21, 0.18);
+  font-size: 14px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
 /* ---------- Últimos 6 meses ---------- */
 .months__bars {
   display: flex;

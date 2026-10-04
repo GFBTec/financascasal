@@ -7,6 +7,7 @@ import {
   groupByDay,
   lastMonths,
   totalsByPerson,
+  totalsByStatus,
 } from './calculations';
 import type { Expense } from './types';
 
@@ -45,6 +46,18 @@ describe('totalsByPerson', () => {
     expect(t.enddy).toEqual({ total: 12, count: 2 });
     expect(t.bento).toEqual({ total: 0, count: 0 });
     expect(t.casal).toEqual({ total: 100, count: 1 });
+  });
+});
+
+describe('totalsByStatus', () => {
+  it('conta e soma pagas e pendentes', () => {
+    const t = totalsByStatus([
+      exp({ amount: 100 }),
+      exp({ amount: 50, status: 'pendente' }),
+      exp({ amount: 25, status: 'pendente' }),
+    ]);
+    expect(t.pago).toEqual({ total: 100, count: 1 });
+    expect(t.pendente).toEqual({ total: 75, count: 2 });
   });
 });
 

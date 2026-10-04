@@ -5,6 +5,7 @@ import {
   lastMonths,
   topExpenses,
   totalsByPerson,
+  totalsByStatus,
 } from '../../domain/calculations';
 import type { Expense } from '../../domain/types';
 import { useGastos } from '../../state/GastosContext';
@@ -14,6 +15,7 @@ import { EvolucaoDiariaCard } from './EvolucaoDiariaCard';
 import { PorCategoriaCard } from './PorCategoriaCard';
 import { UltimosMesesCard } from './UltimosMesesCard';
 import { MaioresGastosCard } from './MaioresGastosCard';
+import { ContasStatusCard } from './ContasStatusCard';
 import './painel.css';
 
 interface PainelScreenProps {
@@ -37,6 +39,7 @@ export function PainelScreen({
 }: PainelScreenProps) {
   const { expenses, budgets, contribs } = useGastos();
   const totals = useMemo(() => totalsByPerson(monthExpenses), [monthExpenses]);
+  const statusTotals = useMemo(() => totalsByStatus(monthExpenses), [monthExpenses]);
   const categories = useMemo(() => categorySummary(monthExpenses, budgets), [monthExpenses, budgets]);
   const months = useMemo(() => lastMonths(expenses, monthKey), [expenses, monthKey]);
 
@@ -62,6 +65,7 @@ export function PainelScreen({
       <div className="cards-row" style={{ alignItems: 'flex-start' }}>
         <PorCategoriaCard categories={categories} onEditBudget={onGoToBudget} />
         <div className="stack" style={{ flex: '1 1 320px', minWidth: 0 }}>
+          <ContasStatusCard totals={statusTotals} />
           <UltimosMesesCard months={months} selectedKey={monthKey} onSelect={onSelectMonth} />
           <MaioresGastosCard expenses={topExpenses(monthExpenses)} onEdit={onEditExpense} />
         </div>
