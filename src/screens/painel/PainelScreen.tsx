@@ -41,7 +41,7 @@ export function PainelScreen({
   const months = useMemo(() => lastMonths(expenses, monthKey), [expenses, monthKey]);
 
   return (
-    <div className="stack">
+    <div className="stack screen">
       <div className="cards-row">
         <CasalCard
           monthKey={monthKey}

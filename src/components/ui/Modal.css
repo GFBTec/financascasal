@@ -7,6 +7,9 @@
   justify-content: center;
   align-items: center;
   padding: 24px;
+  animation: modal-fade-in var(--dur) ease both;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 .modal {
@@ -20,6 +23,7 @@
   flex-direction: column;
   gap: 20px;
   box-shadow: 0 20px 60px rgba(30, 26, 21, 0.3);
+  animation: modal-pop-in var(--dur-slow) var(--ease-out) both;
 }
 
 .modal-title {
@@ -28,6 +32,48 @@
   line-height: 1;
 }
 
+/* O × gira um quarto de volta ao passar o mouse. */
+.modal-close:hover {
+  transform: rotate(90deg);
+}
+.modal-close {
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur) var(--ease-spring);
+}
+
+/* ---------- Saída ---------- */
+.modal-overlay.is-closing {
+  animation: modal-fade-out 220ms ease both;
+}
+.modal-overlay.is-closing .modal {
+  animation: modal-pop-out 220ms ease-in both;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes modal-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+}
+@keyframes modal-pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+/* ---------- Mobile: bottom sheet que sobe e desce ---------- */
 @media (max-width: 819.98px) {
   .modal-overlay {
     align-items: flex-end;
@@ -38,5 +84,20 @@
     max-height: 92dvh;
     padding-bottom: calc(24px + env(safe-area-inset-bottom));
     overscroll-behavior: contain;
+    animation: sheet-in var(--dur-slow) var(--ease-out) both;
+  }
+  .modal-overlay.is-closing .modal {
+    animation: sheet-out 220ms ease-in both;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
   }
 }

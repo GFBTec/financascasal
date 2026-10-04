@@ -29,12 +29,72 @@ button {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    opacity var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+/* Resposta tátil ao toque/clique. */
+button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 button:focus-visible,
 input:focus {
   outline: 2px solid oklch(0.6 0.15 38 / 0.5);
   outline-offset: 1px;
+}
+
+input {
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    background-color var(--dur-fast) ease;
+}
+
+/* ---------- Entradas de tela ---------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+/* Conteúdo de cada tela entra subindo, com os blocos em cascata. */
+.screen > * {
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
+}
+.screen > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.screen > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.screen > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.screen > *:nth-child(n + 5) {
+  animation-delay: 200ms;
+}
+
+/* Quem prefere menos movimento recebe tudo instantâneo. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -239,6 +299,9 @@ input:focus {
 
 /* ---------- Lista suspensa de status (PAGO / PENDENTE) ---------- */
 .status-pill {
+  transition:
+    background-color var(--dur) ease,
+    color var(--dur) ease;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -269,7 +332,6 @@ input:focus {
 .status-select {
   flex: none;
   border-radius: 999px;
-  transition: transform 0.1s;
 }
 .status-select:active {
   transform: scale(0.97);
@@ -297,7 +359,7 @@ input:focus {
   border: 1px solid var(--line);
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(30, 26, 21, 0.16);
-  animation: status-menu-in 0.12s ease-out;
+  animation: status-menu-in var(--dur) var(--ease-spring);
 }
 .status-menu__option {
   display: flex;
@@ -318,9 +380,12 @@ input:focus {
   color: var(--ink);
   text-align: center;
 }
+/* Usa `scale`/`translate` (não `transform`) para não brigar com o translateY(-100%) do menu aberto para cima. */
 @keyframes status-menu-in {
   from {
     opacity: 0;
+    scale: 0.94;
+    translate: 0 -4px;
   }
 }
 

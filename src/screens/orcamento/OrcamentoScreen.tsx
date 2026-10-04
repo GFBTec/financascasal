@@ -40,7 +40,7 @@ export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoS
   }, 3000);
 
   return (
-    <div className="stack" style={{ maxWidth: 760 }}>
+    <div className="stack screen" style={{ maxWidth: 760 }}>
       <Card dark style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 }}>
         <div className="stack" style={{ gap: 8 }}>
           <div className="label label--on-dark">Orçamento mensal</div>

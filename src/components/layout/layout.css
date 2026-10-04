@@ -75,6 +75,14 @@
   justify-content: space-between;
   align-items: center;
 }
+.sidebar__plus {
+  font-size: 20px;
+  line-height: 1;
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+.sidebar__new:hover .sidebar__plus {
+  transform: rotate(90deg) scale(1.15);
+}
 .sidebar__legend {
   margin-top: auto;
   display: flex;
@@ -158,6 +166,11 @@
   text-align: center;
   font-size: 15px;
   font-weight: 500;
+  overflow: hidden;
+}
+.month-picker__text {
+  display: inline-block;
+  animation: rise-in var(--dur) var(--ease-out) both;
 }
 
 /* ---------- Abas inferiores + FAB (mobile) ---------- */
@@ -192,13 +205,17 @@
   width: 18px;
   height: 3px;
   border-radius: 2px;
+  background: var(--enddy);
+  transform: scaleX(0);
+  transition: transform var(--dur) var(--ease-spring);
 }
 .tabbar__item[aria-current='page'] {
   color: var(--ink);
 }
 .tabbar__item[aria-current='page']::before {
-  background: var(--enddy);
+  transform: scaleX(1);
 }
+/* ---------- Botão flutuante "+" ---------- */
 .fab {
   position: fixed;
   right: 18px;
@@ -210,9 +227,85 @@
   background: var(--ink);
   color: var(--card);
   place-items: center;
-  font-size: 30px;
-  line-height: 1;
   box-shadow: 0 8px 24px rgba(30, 26, 21, 0.28);
+  transition:
+    background-color var(--dur) ease,
+    box-shadow var(--dur) ease,
+    transform var(--dur) var(--ease-spring);
+}
+.fab:active:not(:disabled) {
+  transform: scale(0.88);
+}
+.fab.is-open {
+  background: var(--enddy);
+  box-shadow:
+    0 8px 24px oklch(0.6 0.15 38 / 0.45),
+    0 0 0 6px oklch(0.6 0.15 38 / 0.12);
+}
+.fab__icon {
+  position: relative;
+  transition: transform 560ms var(--ease-spring);
+}
+/* "+" gira e vira "×". */
+.fab.is-open .fab__icon {
+  transform: rotate(135deg);
+}
+
+.fab__fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Anel de luz que dá uma volta ao redor do botão. */
+.fab__spin {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    oklch(0.78 0.13 60) 80deg,
+    var(--enddy) 140deg,
+    transparent 220deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  animation: fab-spin 700ms var(--ease-out) both;
+}
+/* Ondas que se espalham a partir do botão. */
+.fab__wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--enddy);
+  animation: fab-wave 650ms var(--ease-out) both;
+}
+.fab__wave--late {
+  animation-delay: 120ms;
+}
+
+@keyframes fab-spin {
+  from {
+    transform: rotate(-90deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    transform: rotate(270deg);
+    opacity: 0;
+  }
+}
+@keyframes fab-wave {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
 }
 
 /* ---------- Toast ---------- */
@@ -221,6 +314,10 @@
   left: 50%;
   bottom: 32px;
   transform: translateX(-50%);
+  animation: toast-in var(--dur-slow) var(--ease-spring) both;
+  transition:
+    opacity var(--dur) ease,
+    transform var(--dur) ease;
   z-index: 60;
   background: var(--ink);
   color: var(--card);
@@ -228,6 +325,17 @@
   border-radius: 999px;
   font-size: 14px;
   box-shadow: 0 8px 24px rgba(30, 26, 21, 0.25);
+}
+.toast.is-leaving {
+  animation: none;
+  opacity: 0;
+  transform: translate(-50%, 10px) scale(0.96);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.94);
+  }
 }
 
 /* ---------- Tela cheia (carregando, login, erros) ---------- */
@@ -238,6 +346,7 @@
   padding: 24px 16px;
 }
 .fullscreen__box {
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
   width: 100%;
   max-width: 380px;
   display: flex;

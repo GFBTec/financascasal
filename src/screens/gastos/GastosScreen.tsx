@@ -27,7 +27,7 @@ export function GastosScreen({ monthKey, monthExpenses, onEditExpense, onNewExpe
   const month = monthName(monthKey);
 
   return (
-    <div className="stack" style={{ gap: 18 }}>
+    <div className="stack screen" style={{ gap: 18 }}>
       <div className="row" style={{ flexWrap: 'wrap', gap: 12 }}>
         <PersonFilter value={filter.who} onChange={(who) => update({ who })} />
         <input

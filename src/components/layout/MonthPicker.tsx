@@ -13,7 +13,12 @@ export function MonthPicker({ monthKey, canGoNext, onPrev, onNext }: MonthPicker
       <button type="button" aria-label="Mês anterior" onClick={onPrev}>
         ‹
       </button>
-      <div className="month-picker__label">{monthLabel(monthKey)}</div>
+      <div className="month-picker__label">
+        {/* `key` reinicia a animação a cada troca de mês. */}
+        <span key={monthKey} className="month-picker__text">
+          {monthLabel(monthKey)}
+        </span>
+      </div>
       <button type="button" aria-label="Próximo mês" disabled={!canGoNext} onClick={onNext}>
         ›
       </button>

@@ -1,20 +1,35 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** Aviso temporário (toast). Some sozinho após `duration` ms. */
+/** Duração da animação de saída (igual à transição de `.toast.is-leaving`). */
+const LEAVE_MS = 260;
+
+/** Aviso temporário (toast). Some sozinho após `duration` ms, com animação de saída. */
 export function useToast(duration = 2200) {
   const [message, setMessage] = useState<string | null>(null);
-  const timer = useRef<number | undefined>(undefined);
+  const [leaving, setLeaving] = useState(false);
+  const timers = useRef<number[]>([]);
+
+  const clearTimers = () => {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current = [];
+  };
 
   const show = useCallback(
     (msg: string) => {
-      window.clearTimeout(timer.current);
+      clearTimers();
       setMessage(msg);
-      timer.current = window.setTimeout(() => setMessage(null), duration);
+      setLeaving(false);
+      timers.current.push(
+        window.setTimeout(() => {
+          setLeaving(true);
+          timers.current.push(window.setTimeout(() => setMessage(null), LEAVE_MS));
+        }, duration),
+      );
     },
     [duration],
   );
 
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => clearTimers, []);
 
-  return { message, show };
+  return { message, leaving, show };
 }

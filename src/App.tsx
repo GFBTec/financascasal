@@ -99,7 +99,7 @@ export default function App() {
         )}
       </main>
 
-      <TabBar screen={screen} onNavigate={setScreen} onNewExpense={openNew} />
+      <TabBar screen={screen} composing={!!expenseModal} onNavigate={setScreen} onNewExpense={openNew} />
 
       {expenseModal && (
         <ExpenseModal
@@ -125,7 +125,7 @@ export default function App() {
         />
       )}
 
-      <Toast message={toast.message} />
+      <Toast message={toast.message} leaving={toast.leaving} />
     </div>
   );
 }

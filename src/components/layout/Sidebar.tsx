@@ -38,7 +38,7 @@ export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: Sideba
 
       <button type="button" className="btn-primary sidebar__new" onClick={onNewExpense}>
         <span>Novo gasto</span>
-        <span style={{ fontSize: 20, lineHeight: 1 }}>+</span>
+        <span className="sidebar__plus">+</span>
       </button>
 
       <div className="sidebar__legend">
