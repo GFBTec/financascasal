@@ -168,13 +168,12 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
             className="text-input"
             type="date"
             value={form.date}
-            style={{ padding: '12px 14px' }}
             onChange={(e) => set({ date: e.target.value })}
           />
         </div>
         <div className="field" style={{ flex: '2 1 260px' }}>
           <div className="label label--small">Pagamento</div>
-          <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+          <div className="pay-options">
             {PAYMENT_METHODS.map((p) => (
               <Chip
                 key={p}
@@ -212,7 +211,7 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
 
       {error && <div style={{ fontSize: 14, color: COLORS.alertText }}>{error}</div>}
 
-      <div className="row">
+      <div className="row modal-actions">
         {expense && (
           <button type="button" className="btn-danger" style={{ border: 'none', padding: '14px 16px' }} onClick={del.trigger}>
             {del.armed ? 'Confirmar exclusão' : 'Excluir'}

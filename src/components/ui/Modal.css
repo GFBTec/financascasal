@@ -35,5 +35,8 @@
   }
   .modal {
     border-radius: var(--radius-modal) var(--radius-modal) 0 0;
+    max-height: 92dvh;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
   }
 }

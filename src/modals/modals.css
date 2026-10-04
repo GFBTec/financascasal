@@ -60,7 +60,55 @@
   padding: 9px 12px;
   font-size: 14px;
 }
+.pay-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 .chip--pay {
   padding: 10px 12px;
   border-radius: 10px;
+  justify-content: center;
+}
+
+.text-input[type='date'] {
+  display: block;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ---------- Mobile (< 820px) ---------- */
+@media (max-width: 819.98px) {
+  /* Pagamento em grade de 3 colunas: nenhuma opção fica sozinha numa linha "quebrada". */
+  .pay-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .chip--pay {
+    min-height: 44px;
+  }
+
+  /* iOS dá zoom automático em campos com fonte < 16px. */
+  .modal .text-input {
+    font-size: 16px;
+  }
+
+  /* Botões de ação sempre visíveis no rodapé do bottom sheet. */
+  .modal-actions {
+    position: sticky;
+    /* O sticky respeita o padding do sheet; o deslocamento negativo encosta na borda real. */
+    bottom: calc(-24px - env(safe-area-inset-bottom));
+    z-index: 1;
+    /* Encosta no fim do sheet, compensando o padding inferior (que inclui a área segura). */
+    margin: 0 -24px calc(-24px - env(safe-area-inset-bottom));
+    padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+    background: var(--card);
+    border-top: 1px solid var(--line);
+  }
+  .modal-actions .btn-primary {
+    flex: 1;
+  }
 }
