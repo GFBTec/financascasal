@@ -1,5 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { parseAmount, parseInteger } from './money';
+import { maskCurrencyInput, parseAmount, parseInteger } from './money';
+
+describe('maskCurrencyInput', () => {
+  it.each([
+    ['5', '0,05'],
+    ['58', '0,58'],
+    ['8750', '87,50'],
+    ['123456', '1.234,56'],
+    ['87,5', '8,75'], // apagar o último dígito de '87,50'
+    ['abc12', '0,12'], // texto é descartado
+    ['000', ''],
+    ['', ''],
+  ])('%s → %s', (input, expected) => {
+    expect(maskCurrencyInput(input)).toBe(expected);
+  });
+
+  it('o resultado volta a ser lido como número', () => {
+    expect(parseAmount(maskCurrencyInput('123456'))).toBe(1234.56);
+  });
+});
 
 describe('parseAmount', () => {
   it.each([

@@ -5,7 +5,7 @@ import { Modal } from '../components/ui/Modal';
 import { Chip } from '../components/ui/Chip';
 import { Dot } from '../components/ui/Dot';
 import { useConfirm } from '../hooks/useConfirm';
-import { parseAmount } from '../lib/money';
+import { maskCurrencyInput, parseAmount } from '../lib/money';
 import { uid } from '../lib/id';
 import './modals.css';
 
@@ -32,7 +32,7 @@ interface ExpenseModalProps {
 function initialForm(expense: Expense | undefined, defaultWho: PersonId, defaultDate: string): ExpenseForm {
   if (expense) {
     return {
-      amount: expense.amount.toFixed(2).replace('.', ','),
+      amount: maskCurrencyInput(expense.amount.toFixed(2)),
       desc: expense.desc,
       place: expense.place || '',
       who: expense.who,
@@ -77,11 +77,11 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
         <span>R$</span>
         <input
           value={form.amount}
-          inputMode="decimal"
+          inputMode="numeric"
           placeholder="0,00"
           aria-label="Valor"
           autoFocus
-          onChange={(e) => set({ amount: e.target.value })}
+          onChange={(e) => set({ amount: maskCurrencyInput(e.target.value) })}
         />
       </div>
 
