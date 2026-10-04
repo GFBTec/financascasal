@@ -1,4 +1,13 @@
-import type { Budgets, Category, CategoryId, Contribution, PaymentMethod, Person, PersonId } from './types';
+import type {
+  Budgets,
+  Category,
+  CategoryId,
+  Contribution,
+  ExpenseStatus,
+  PaymentMethod,
+  Person,
+  PersonId,
+} from './types';
 
 export const CATEGORIES: Category[] = [
   { id: 'comida', name: 'Comida', color: 'oklch(0.66 0.13 60)' },
@@ -28,6 +37,16 @@ export const PEOPLE: Record<PersonId, Person> = {
 export const PERSON_IDS: PersonId[] = ['enddy', 'bento', 'casal'];
 
 export const PAYMENT_METHODS: PaymentMethod[] = ['Crédito', 'Débito', 'Pix', 'Dinheiro', 'VR/VA'];
+
+export const DEFAULT_STATUS: ExpenseStatus = 'pago';
+
+/** Rótulo e cores (texto forte + fundo claro) de cada status. */
+export const STATUSES: Record<ExpenseStatus, { label: string; color: string; bg: string }> = {
+  pago: { label: 'Pago', color: 'oklch(0.45 0.14 150)', bg: 'oklch(0.93 0.06 150)' },
+  pendente: { label: 'Pendente', color: 'oklch(0.50 0.19 27)', bg: 'oklch(0.93 0.05 25)' },
+};
+
+export const STATUS_IDS: ExpenseStatus[] = ['pago', 'pendente'];
 
 export const DEFAULT_BUDGETS: Budgets = {
   comida: 1200,

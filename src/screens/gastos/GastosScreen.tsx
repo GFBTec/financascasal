@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { CATEGORIES, COLORS, PEOPLE } from '../../domain/constants';
 import { filterExpenses, groupByDay, sumAmounts, type ExpenseFilter } from '../../domain/calculations';
 import type { Expense } from '../../domain/types';
+import { useGastos } from '../../state/GastosContext';
 import { Chip } from '../../components/ui/Chip';
 import { Dot } from '../../components/ui/Dot';
 import { formatBRL, plural } from '../../lib/format';
@@ -24,6 +25,7 @@ const WHO_FILTERS: { id: ExpenseFilter['who']; label: string; dot: string }[] = 
 ];
 
 export function GastosScreen({ monthKey, monthExpenses, onEditExpense, onNewExpense }: GastosScreenProps) {
+  const { saveExpense } = useGastos();
   const [filter, setFilter] = useState<ExpenseFilter>({ who: 'all', cat: 'all', query: '' });
   const update = (patch: Partial<ExpenseFilter>) => setFilter((f) => ({ ...f, ...patch }));
 
@@ -101,7 +103,12 @@ export function GastosScreen({ monthKey, monthExpenses, onEditExpense, onNewExpe
             </div>
             <div className="day-group__list">
               {g.items.map((e) => (
-                <ExpenseItem key={e.id} expense={e} onClick={() => onEditExpense(e)} />
+                <ExpenseItem
+                  key={e.id}
+                  expense={e}
+                  onClick={() => onEditExpense(e)}
+                  onStatusChange={(status) => saveExpense({ ...e, status })}
+                />
               ))}
             </div>
           </div>

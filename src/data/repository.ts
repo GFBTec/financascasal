@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { DEFAULT_CONTRIBUTION, DEFAULT_CONTRIBUTION_KEY } from '../domain/constants';
+import { DEFAULT_CONTRIBUTION, DEFAULT_CONTRIBUTION_KEY, DEFAULT_STATUS } from '../domain/constants';
 import type { Budgets, CategoryId, Contribution, Contributions, Expense } from '../domain/types';
 
 /** Acesso ao Supabase. Converte entre as linhas do banco e os tipos do app. */
@@ -12,10 +12,11 @@ interface ExpenseRow {
   who: Expense['who'];
   cat: Expense['cat'];
   pay: Expense['pay'];
+  status: Expense['status'] | null;
   date: string;
 }
 
-const EXPENSE_COLUMNS = 'id, amount, description, place, who, cat, pay, date';
+const EXPENSE_COLUMNS = 'id, amount, description, place, who, cat, pay, status, date';
 const PAGE_SIZE = 1000; // limite padrão de linhas por requisição no Supabase
 
 const toExpense = (r: ExpenseRow): Expense => ({
@@ -26,6 +27,7 @@ const toExpense = (r: ExpenseRow): Expense => ({
   who: r.who,
   cat: r.cat,
   pay: r.pay,
+  status: r.status ?? DEFAULT_STATUS,
   date: r.date,
 });
 
@@ -37,6 +39,7 @@ const toRow = (e: Expense) => ({
   who: e.who,
   cat: e.cat,
   pay: e.pay,
+  status: e.status,
   date: e.date,
 });
 

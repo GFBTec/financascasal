@@ -1,6 +1,15 @@
 import { useState } from 'react';
-import { CATEGORIES, COLORS, PAYMENT_METHODS, PEOPLE, PERSON_IDS } from '../domain/constants';
-import type { CategoryId, Expense, PaymentMethod, PersonId } from '../domain/types';
+import {
+  CATEGORIES,
+  COLORS,
+  DEFAULT_STATUS,
+  PAYMENT_METHODS,
+  PEOPLE,
+  PERSON_IDS,
+  STATUSES,
+  STATUS_IDS,
+} from '../domain/constants';
+import type { CategoryId, Expense, ExpenseStatus, PaymentMethod, PersonId } from '../domain/types';
 import { Modal } from '../components/ui/Modal';
 import { Chip } from '../components/ui/Chip';
 import { Dot } from '../components/ui/Dot';
@@ -16,6 +25,7 @@ interface ExpenseForm {
   who: PersonId;
   cat: CategoryId;
   pay: PaymentMethod;
+  status: ExpenseStatus;
   date: string;
 }
 
@@ -38,10 +48,20 @@ function initialForm(expense: Expense | undefined, defaultWho: PersonId, default
       who: expense.who,
       cat: expense.cat,
       pay: expense.pay,
+      status: expense.status,
       date: expense.date,
     };
   }
-  return { amount: '', desc: '', place: '', who: defaultWho, cat: 'comida', pay: 'Crédito', date: defaultDate };
+  return {
+    amount: '',
+    desc: '',
+    place: '',
+    who: defaultWho,
+    cat: 'comida',
+    pay: 'Crédito',
+    status: DEFAULT_STATUS,
+    date: defaultDate,
+  };
 }
 
 export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave, onDelete }: ExpenseModalProps) {
@@ -67,6 +87,7 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
       who: form.who,
       cat: form.cat,
       pay: form.pay,
+      status: form.status,
       date: form.date,
     });
   };
@@ -164,6 +185,28 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
               />
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="field">
+        <div className="label label--small">Status</div>
+        <div className="row">
+          {STATUS_IDS.map((id) => {
+            const s = STATUSES[id];
+            const on = form.status === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                className="status-option"
+                aria-pressed={on}
+                style={on ? { color: s.color, background: s.bg, borderColor: s.color } : undefined}
+                onClick={() => set({ status: id })}
+              >
+                {s.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

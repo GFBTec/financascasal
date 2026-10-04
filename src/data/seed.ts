@@ -99,7 +99,17 @@ export function seedData(now = new Date()): Expense[] {
       pay: PaymentMethod,
     ) => {
       if (day > last) return;
-      out.push({ id: uid(), amount: Math.round(amount * 100) / 100, desc, place, cat, who, pay, date: toISODate(y, mo, day) });
+      out.push({
+        id: uid(),
+        amount: Math.round(amount * 100) / 100,
+        desc,
+        place,
+        cat,
+        who,
+        pay,
+        status: 'pago',
+        date: toISODate(y, mo, day),
+      });
     };
 
     // Fixos

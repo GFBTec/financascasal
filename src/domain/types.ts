@@ -15,6 +15,8 @@ export type CategoryId =
 
 export type PaymentMethod = 'Crédito' | 'Débito' | 'Pix' | 'Dinheiro' | 'VR/VA';
 
+export type ExpenseStatus = 'pago' | 'pendente';
+
 export interface Expense {
   id: string;
   amount: number;
@@ -23,6 +25,7 @@ export interface Expense {
   who: PersonId;
   cat: CategoryId;
   pay: PaymentMethod;
+  status: ExpenseStatus;
   /** AAAA-MM-DD */
   date: string;
 }

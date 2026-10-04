@@ -62,14 +62,58 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  width: 100%;
-  padding: 14px 16px;
+  padding-right: 16px;
 }
 .expense-item + .expense-item {
   border-top: 1px solid rgba(30, 26, 21, 0.08);
 }
 .expense-item:hover {
   background: rgba(30, 26, 21, 0.04);
+}
+.expense-item__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0 14px 16px;
+}
+
+.expense-item__who-dot {
+  display: none;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: 1px;
+}
+
+/* Mobile: a pessoa vira um ponto colorido na linha de detalhes e o seletor fica compacto. */
+@media (max-width: 819.98px) {
+  .expense-item,
+  .expense-item__main {
+    gap: 10px;
+  }
+  .expense-item {
+    padding-right: 12px;
+  }
+  .expense-item__main {
+    padding-left: 12px;
+  }
+  .expense-item__badge {
+    display: none;
+  }
+  .expense-item__who-dot {
+    display: inline-block;
+  }
+  .expense-item .status-select select {
+    padding: 5px 20px 5px 9px;
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+  }
+  .expense-item .status-select::after {
+    right: 8px;
+  }
 }
 .expense-item__icon {
   flex: none;

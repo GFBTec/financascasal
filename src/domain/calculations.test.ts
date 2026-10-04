@@ -18,6 +18,7 @@ const exp = (p: Partial<Expense>): Expense => ({
   who: 'enddy',
   cat: 'comida',
   pay: 'Crédito',
+  status: 'pago',
   date: '2026-10-01',
   ...p,
 });
