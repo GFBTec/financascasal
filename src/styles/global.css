@@ -210,43 +210,90 @@ input:focus {
 }
 
 /* ---------- Lista suspensa de status (PAGO / PENDENTE) ---------- */
-.status-select {
-  position: relative;
-  flex: none;
+.status-pill {
   display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
   border-radius: 999px;
-}
-.status-select select {
-  appearance: none;
-  border: none;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  padding: 6px 26px 6px 12px;
   font-family: var(--font-mono);
   font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
-.status-select select:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 1px;
+.status-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+.status-pill__chevron {
+  font-size: 10px;
+  margin-left: 1px;
+  transition: transform 0.15s;
+}
+.status-pill__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.status-select {
+  flex: none;
   border-radius: 999px;
+  transition: transform 0.1s;
 }
-.status-select option {
-  color: var(--ink);
+.status-select:active {
+  transform: scale(0.97);
+}
+.status-select:focus-visible {
+  outline-offset: 2px;
+}
+/* Largura fixa: PAGO e PENDENTE ficam alinhados na coluna. */
+.status-select .status-pill {
+  min-width: 118px;
+}
+.status-select .status-pill__chevron {
+  margin-left: auto;
+}
+
+.status-menu {
+  position: fixed;
+  z-index: 70;
+  min-width: 150px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   background: var(--card);
-  text-transform: none;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(30, 26, 21, 0.16);
+  animation: status-menu-in 0.12s ease-out;
 }
-.status-select::after {
-  content: '▾';
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px;
-  pointer-events: none;
+.status-menu__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 10px;
+}
+.status-menu__option:hover,
+.status-menu__option:focus-visible {
+  background: rgba(30, 26, 21, 0.06);
+  outline: none;
+}
+.status-menu__check {
+  width: 14px;
+  font-size: 13px;
+  color: var(--ink);
+  text-align: center;
+}
+@keyframes status-menu-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* ---------- Barra de progresso ---------- */

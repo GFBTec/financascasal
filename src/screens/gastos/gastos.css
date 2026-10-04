@@ -106,13 +106,12 @@
   .expense-item__who-dot {
     display: inline-block;
   }
-  .expense-item .status-select select {
-    padding: 5px 20px 5px 9px;
+  .expense-item .status-pill {
+    min-width: 96px;
+    gap: 5px;
+    padding: 5px 9px;
     font-size: 10.5px;
     letter-spacing: 0.03em;
-  }
-  .expense-item .status-select::after {
-    right: 8px;
   }
 }
 .expense-item__icon {
