@@ -209,6 +209,34 @@ input:focus {
   color: var(--card);
 }
 
+/* ---------- Controle segmentado (filtro de pessoa) ---------- */
+.segmented {
+  display: flex;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 4px;
+}
+.segmented .chip {
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+}
+.segmented--small {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+  gap: 2px;
+  padding: 3px;
+}
+.segmented--small .chip {
+  padding: 6px 10px;
+  font-size: 12.5px;
+  gap: 6px;
+}
+
 /* ---------- Lista suspensa de status (PAGO / PENDENTE) ---------- */
 .status-pill {
   display: inline-flex;

@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { STATUSES, STATUS_IDS } from '../../domain/constants';
-import type { StatusTotals } from '../../domain/calculations';
-import type { ExpenseStatus } from '../../domain/types';
+import { useMemo, useState } from 'react';
+import { PEOPLE, STATUSES, STATUS_IDS } from '../../domain/constants';
+import { totalsByStatus } from '../../domain/calculations';
+import type { Expense, ExpenseStatus } from '../../domain/types';
 import { Card } from '../../components/ui/Card';
 import { Dot } from '../../components/ui/Dot';
+import { PersonFilter, type PersonFilterValue } from '../../components/ui/PersonFilter';
 import { formatBRL, plural } from '../../lib/format';
 
 const SIZE = 136;
@@ -15,9 +16,14 @@ const GAP = 3;
 
 const contas = (n: number) => plural(n, 'conta');
 
-/** Rosca PAGO × PENDENTE com o resumo de quantas contas faltam pagar no mês. */
-export function ContasStatusCard({ totals }: { totals: StatusTotals }) {
+/** Rosca PAGO × PENDENTE com o resumo de quantas contas faltam pagar no mês, filtrável por pessoa. */
+export function ContasStatusCard({ monthExpenses }: { monthExpenses: Expense[] }) {
   const [hovered, setHovered] = useState<ExpenseStatus | null>(null);
+  const [who, setWho] = useState<PersonFilterValue>('all');
+  const totals = useMemo(
+    () => totalsByStatus(who === 'all' ? monthExpenses : monthExpenses.filter((e) => e.who === who)),
+    [monthExpenses, who],
+  );
   const count = totals.pago.count + totals.pendente.count;
   const visible = STATUS_IDS.filter((id) => totals[id].count > 0);
 
@@ -30,19 +36,22 @@ export function ContasStatusCard({ totals }: { totals: StatusTotals }) {
     return arc;
   });
 
-  const summary = !count
-    ? 'Nenhuma conta registrada neste mês.'
+  const whoName = who === 'all' ? '' : PEOPLE[who].name;
+  const text = !count
+    ? `Nenhuma conta ${whoName ? `de ${whoName} ` : ''}registrada neste mês.`
     : totals.pendente.count === 0
       ? `Todas as ${contas(count)} do mês estão pagas.`
       : `De ${contas(count)}, ${totals.pago.count === 1 ? '1 está paga' : `${totals.pago.count} estão pagas`} e ${
           totals.pendente.count === 1 ? 'existe 1 conta' : `existem ${totals.pendente.count} contas`
         } a pagar.`;
+  const summary = whoName && count ? `${whoName}: ${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
 
   const center = hovered ? totals[hovered] : null;
 
   return (
     <Card style={{ gap: 16 }}>
       <div className="label">Contas do mês</div>
+      <PersonFilter small value={who} onChange={setWho} />
 
       <div className="status-chart">
         <svg

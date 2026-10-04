@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { CATEGORIES, COLORS, PEOPLE } from '../../domain/constants';
+import { CATEGORIES, COLORS } from '../../domain/constants';
 import { filterExpenses, groupByDay, sumAmounts, type ExpenseFilter } from '../../domain/calculations';
 import type { Expense } from '../../domain/types';
 import { useGastos } from '../../state/GastosContext';
 import { Chip } from '../../components/ui/Chip';
-import { Dot } from '../../components/ui/Dot';
+import { PersonFilter } from '../../components/ui/PersonFilter';
 import { formatBRL, plural } from '../../lib/format';
 import { longDayLabel, monthName } from '../../lib/date';
 import { ExpenseItem } from './ExpenseItem';
@@ -16,13 +16,6 @@ interface GastosScreenProps {
   onEditExpense: (expense: Expense) => void;
   onNewExpense: () => void;
 }
-
-const WHO_FILTERS: { id: ExpenseFilter['who']; label: string; dot: string }[] = [
-  { id: 'all', label: 'Todos', dot: COLORS.neutralDot },
-  { id: 'enddy', label: 'Enddy', dot: PEOPLE.enddy.color },
-  { id: 'bento', label: 'Bento', dot: PEOPLE.bento.color },
-  { id: 'casal', label: 'Casal', dot: PEOPLE.casal.color },
-];
 
 export function GastosScreen({ monthKey, monthExpenses, onEditExpense, onNewExpense }: GastosScreenProps) {
   const { saveExpense } = useGastos();
@@ -36,20 +29,7 @@ export function GastosScreen({ monthKey, monthExpenses, onEditExpense, onNewExpe
   return (
     <div className="stack" style={{ gap: 18 }}>
       <div className="row" style={{ flexWrap: 'wrap', gap: 12 }}>
-        <div className="segmented">
-          {WHO_FILTERS.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className="chip"
-              aria-pressed={filter.who === f.id}
-              onClick={() => update({ who: f.id })}
-            >
-              <Dot color={f.dot} />
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <PersonFilter value={filter.who} onChange={(who) => update({ who })} />
         <input
           className="search-input"
           value={filter.query}
