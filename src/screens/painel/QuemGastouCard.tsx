@@ -34,12 +34,10 @@ export function QuemGastouCard({ totals }: { totals: PersonTotals }) {
             <div key={id} className="row" style={{ gap: 12 }}>
               <Dot color={PEOPLE[id].color} size={10} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 500 }}>{PEOPLE[id].name}</div>
-                <div className="muted" style={{ fontSize: 12.5 }}>
-                  {id === 'casal' ? `conta conjunta · ${sub}` : sub}
-                </div>
+                <div style={{ fontSize: 'var(--text-body)', fontWeight: 600 }}>{PEOPLE[id].name}</div>
+                <div className="meta">{id === 'casal' ? `conta conjunta · ${sub}` : sub}</div>
               </div>
-              <div className="who-card__value">{formatBRL(t.total)}</div>
+              <div className="value">{formatBRL(t.total)}</div>
             </div>
           );
         })}

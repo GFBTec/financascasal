@@ -1,34 +1,71 @@
-/* ---------- Conta do casal ---------- */
+/* =========================================================================
+   Linha 1 — Conta do casal (2fr) · Contas do mês (1fr) · Quem gastou (1fr)
+   ========================================================================= */
 .casal-card {
-  flex: 2 1 440px;
+  flex: 2 1 380px;
   padding: clamp(22px, 3vw, 32px);
   gap: 22px;
 }
+.contas-card,
+.who-card {
+  flex: 1 1 250px;
+}
+
+/* ---------- Conta do casal ---------- */
+.casal-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 12px;
+}
 .casal-card__edit {
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
   border: 1px solid rgba(251, 248, 241, 0.3);
   color: var(--card);
+  font-size: var(--text-meta);
+  font-weight: 500;
+  white-space: nowrap;
 }
 .casal-card__edit:hover {
   background: rgba(251, 248, 241, 0.1);
 }
+.casal-card__eye {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--card);
+  border: 1px solid rgba(251, 248, 241, 0.3);
+}
+.casal-card__eye:hover {
+  background: rgba(251, 248, 241, 0.1);
+}
+.casal-card__eye[aria-pressed='true'] {
+  background: rgba(251, 248, 241, 0.14);
+}
+.casal-card button:focus-visible {
+  outline-color: rgba(251, 248, 241, 0.7);
+}
 .casal-card__value {
   font-family: var(--font-serif);
-  font-size: clamp(52px, 8vw, 92px);
+  font-size: var(--text-hero);
   line-height: 0.9;
   letter-spacing: -0.025em;
+  white-space: nowrap;
 }
 .casal-card__sub {
-  font-size: 14px;
-  color: var(--on-dark-muted);
+  font-size: var(--text-sm);
+  color: rgba(251, 248, 241, 0.78);
 }
 
 /* ---------- Quem gastou ---------- */
-.who-card {
-  flex: 1 1 300px;
-}
 .who-card__bar {
   display: flex;
   height: 14px;
@@ -39,23 +76,370 @@
 }
 .who-card__bar > div {
   border-radius: 99px;
-  transition: width 0.5s;
-}
-.who-card__value {
-  font-family: var(--font-serif);
-  font-size: 28px;
-  line-height: 1;
+  transition: width 0.5s var(--ease-out);
 }
 .who-card__diff {
   margin-top: auto;
   padding-top: 14px;
   border-top: 1px dashed rgba(30, 26, 21, 0.18);
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.4;
   text-wrap: pretty;
 }
 
-/* ---------- Evolução diária ---------- */
+/* ---------- Contas do mês (rosca pago × pendente) ---------- */
+.status-chart {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.status-chart svg {
+  flex: none;
+}
+.status-chart__value {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  fill: var(--ink);
+}
+.status-chart__caption {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--muted);
+}
+.status-chart__legend {
+  flex: 1 1 110px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.status-chart__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.15s;
+}
+.status-chart__summary {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(30, 26, 21, 0.18);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+/* =========================================================================
+   Linha 2 — Assistente do mês
+   ========================================================================= */
+.assistant-card {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(120deg, oklch(0.8 0.13 200), oklch(0.6 0.21 285)) border-box;
+  gap: 20px;
+}
+.assistant__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.assistant__badge {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--grad-tech-diag);
+  box-shadow: var(--glow-tech);
+}
+
+/* Pagamento todo dia [−] N [+] */
+.payday {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 3px 3px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(30, 26, 21, 0.05);
+}
+.payday__label {
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+.payday button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  color: var(--ink);
+}
+.payday button:hover:not(:disabled) {
+  background: #fff;
+}
+.payday button:disabled {
+  opacity: 0.35;
+}
+.payday__value {
+  min-width: 26px;
+  text-align: center;
+  font-weight: 700;
+  font-size: var(--text-body);
+}
+
+.assistant__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 28px;
+}
+.assistant__summary {
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.assistant__tips {
+  flex: 1.2 1 360px;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.assistant__lead {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.assistant__perday {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.assistant__perday-value {
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 5vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.assistant__perday-unit {
+  font-size: var(--text-lg);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+/* Barras Ideal × Ritmo atual */
+.pace {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+.pace__row {
+  display: grid;
+  grid-template-columns: 82px 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.pace__label {
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.pace__track {
+  height: 8px;
+  border-radius: 99px;
+  background: rgba(30, 26, 21, 0.07);
+}
+.pace__track > span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s var(--ease-out);
+}
+.pace__value {
+  font-size: var(--text-meta);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.assistant__pace-text {
+  margin: 2px 0 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+.assistant__pace-text.is-good {
+  color: var(--pago-text);
+}
+.assistant__pace-text.is-bad {
+  color: var(--pendente-text);
+}
+
+/* Dicas */
+.tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: var(--field);
+  border: 1px solid rgba(30, 26, 21, 0.07);
+  border-radius: var(--radius-ctl);
+}
+.tip__icon {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--radius-ctl);
+  display: grid;
+  place-items: center;
+}
+.tip__icon.sev-ok {
+  background: var(--sev-ok-bg);
+  color: var(--sev-ok-fg);
+}
+.tip__icon.sev-info {
+  background: var(--sev-info-bg);
+  color: var(--sev-info-fg);
+}
+.tip__icon.sev-warn {
+  background: var(--sev-warn-bg);
+  color: var(--sev-warn-fg);
+}
+.tip__icon.sev-bad {
+  background: var(--sev-bad-bg);
+  color: var(--sev-bad-fg);
+}
+.tip__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.tip__text {
+  margin-top: 2px;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+/* Pergunte ao assistente */
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(30, 26, 21, 0.18);
+}
+.ask__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ask__chip {
+  padding: 8px 13px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--ai-border);
+  background: var(--ai-soft);
+  color: var(--ai-text);
+  font-size: var(--text-meta);
+  font-weight: 500;
+}
+.ask__chip:hover:not(:disabled) {
+  background: oklch(0.6 0.21 285 / 0.12);
+}
+.ask__chip:disabled {
+  opacity: 0.5;
+}
+.ask__form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 5px 5px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-strong);
+  background: var(--field);
+  transition: border-color var(--dur-fast) ease;
+}
+.ask__form:focus-within {
+  border-color: var(--ai);
+}
+.ask__input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-body);
+  color: var(--ink);
+}
+.ask__input::placeholder {
+  color: var(--muted);
+}
+.ask__send {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--grad-tech-diag);
+}
+.ask__send:disabled {
+  opacity: 0.5;
+}
+.ask__status {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ai-text);
+}
+.ask__status.is-error {
+  color: var(--pendente-text);
+}
+.ask__answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-ctl);
+  background: var(--ai-soft);
+  border: 1px solid oklch(0.6 0.21 285 / 0.18);
+  color: var(--ai-text);
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
+}
+.ask__answer p {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* =========================================================================
+   Linha 3 — Evolução diária
+   ========================================================================= */
+.daily__info {
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+}
+.daily__plot {
+  position: relative;
+}
 .daily__bars,
 .daily__axis {
   display: flex;
@@ -63,7 +447,7 @@
 }
 .daily__bars {
   align-items: flex-end;
-  height: 190px;
+  height: 200px;
   border-bottom: 1px solid var(--line-strong);
 }
 .daily__day {
@@ -80,7 +464,7 @@
 }
 .daily__day > div {
   border-radius: 2px;
-  transition: height 0.4s;
+  transition: height 0.4s var(--ease-out);
 }
 .daily__day--future {
   background: repeating-linear-gradient(135deg, rgba(30, 26, 21, 0.04) 0 4px, transparent 4px 8px);
@@ -94,27 +478,67 @@
   left: 50%;
   transform: translate(-50%, -100%);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-label);
   white-space: nowrap;
   color: var(--muted);
+}
+/* Linha de média diária */
+.daily__avg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-top: 1.5px dashed rgba(30, 26, 21, 0.5);
+  pointer-events: none;
+  transition: bottom 0.4s var(--ease-out);
+}
+.daily__avg > span {
+  position: absolute;
+  right: 0;
+  bottom: 3px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--card);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.daily__avg-legend i {
+  display: inline-block;
+  width: 14px;
+  border-top: 1.5px dashed rgba(30, 26, 21, 0.5);
 }
 .daily__axis > div {
   flex: 1;
   min-width: 0;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-label);
   color: var(--muted);
 }
 .daily__axis > .is-today {
-  color: var(--enddy);
+  color: var(--ink);
+  font-weight: 700;
 }
 
-/* ---------- Por categoria ---------- */
+/* =========================================================================
+   Linha 4 — Por categoria (1.3fr) · Maiores gastos (1fr)
+   ========================================================================= */
 .cats-card {
-  flex: 1.4 1 420px;
+  flex: 1.3 1 380px;
+}
+.top-card {
+  flex: 1 1 300px;
 }
 .cat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cat-row__body {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -127,65 +551,73 @@
 .cat-row__name {
   flex: 1;
   min-width: 0;
-  font-size: 14.5px;
+  font-size: var(--text-sm);
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .cat-row__sub {
-  min-width: 92px;
+  min-width: 72px;
   text-align: right;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-meta);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.cat-row__sub.is-over {
+  color: var(--pendente-text);
+  font-weight: 600;
 }
 
-/* ---------- Contas do mês (rosca pago × pendente) ---------- */
-.status-chart {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.status-chart svg {
-  flex: none;
-}
-.status-chart__value {
-  font-family: var(--font-serif);
-  font-size: 30px;
-  fill: var(--ink);
-}
-.status-chart__caption {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  fill: var(--muted);
-}
-.status-chart__legend {
-  flex: 1 1 140px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.status-chart__row {
+/* Maiores gastos */
+.top-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: opacity 0.15s;
+  padding: 8px;
+  margin: 0 -8px;
+  border-radius: var(--radius-ctl);
 }
-.status-chart__summary {
-  padding-top: 14px;
-  border-top: 1px dashed rgba(30, 26, 21, 0.18);
-  font-size: 14px;
-  line-height: 1.4;
-  text-wrap: pretty;
+.top-item:hover {
+  background: rgba(30, 26, 21, 0.05);
+}
+.top-item__rank {
+  width: 14px;
+  flex: none;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--muted);
+}
+.top-item__desc {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-item__meta {
+  font-size: var(--text-meta);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.top-item__meta > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ---------- Últimos 6 meses ---------- */
+/* =========================================================================
+   Linha 5 — Últimos 6 meses
+   ========================================================================= */
 .months__bars {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
-  height: 170px;
+  gap: 8px;
+  height: 180px;
 }
 .months__bar {
   flex: 1;
@@ -194,77 +626,74 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: stretch;
+  align-items: center;
   gap: 6px;
-  opacity: 0.5;
+  padding: 8px 4px 6px;
+  border-radius: var(--radius-ctl);
 }
-.months__bar:hover,
+.months__bar:hover {
+  background: rgba(30, 26, 21, 0.04);
+}
 .months__bar[aria-pressed='true'] {
-  opacity: 1;
+  background: rgba(30, 26, 21, 0.07);
 }
 .months__stack {
+  width: 100%;
+  max-width: 56px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  transition: height 0.4s;
+  transition: height 0.4s var(--ease-out);
 }
 .months__stack > div {
   border-radius: 2px;
 }
 .months__stack > div:first-child {
-  border-radius: 4px 4px 2px 2px;
+  border-radius: 6px 6px 2px 2px;
 }
 .months__value {
   text-align: center;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--ink-soft);
   white-space: nowrap;
 }
 .months__label {
   text-align: center;
-  font-size: 12.5px;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
 }
+.months__bar[aria-pressed='true'] .months__value,
 .months__bar[aria-pressed='true'] .months__label {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--ink);
 }
 
-/* ---------- Maiores gastos ---------- */
-.top-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 8px;
-  margin: 0 -8px;
-  border-radius: 10px;
-}
-.top-item:hover {
-  background: rgba(30, 26, 21, 0.05);
-}
-.top-item__rank {
-  width: 18px;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 22px;
-  color: var(--muted);
-}
-.top-item__desc {
-  font-size: 14.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.top-item__meta {
-  font-size: 12.5px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
+/* =========================================================================
+   Mobile
+   ========================================================================= */
 @media (max-width: 819.98px) {
   .daily__bars,
   .daily__axis {
     gap: 2px;
+  }
+  .months__bars {
+    gap: 4px;
+  }
+  .months__value {
+    font-size: 10px;
+  }
+  .pace__row {
+    grid-template-columns: 74px 1fr auto;
+  }
+  .assistant__tips,
+  .assistant__summary {
+    flex-basis: 100%;
+  }
+  .ask__input {
+    font-size: 16px;
+  }
+  .tip {
+    padding: 10px;
   }
 }

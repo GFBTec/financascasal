@@ -92,6 +92,7 @@ export default function App() {
             monthExpenses={monthExpenses}
             onEditExpense={openEdit}
             onNewExpense={openNew}
+            onToast={toast.show}
           />
         )}
         {screen === 'orcamento' && (

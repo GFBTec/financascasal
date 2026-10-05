@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
-import { COLORS } from '../../domain/constants';
-import { FullScreen } from '../../components/layout/FullScreen';
+import { COLORS, PEOPLE, PERSON_IDS } from '../../domain/constants';
+import { Dot } from '../../components/ui/Dot';
+import '../../components/layout/layout.css';
+import './login.css';
 
 function loginErrorMessage(code: string | undefined, message: string) {
   switch (code) {
@@ -33,31 +35,56 @@ export function LoginScreen() {
   };
 
   return (
-    <FullScreen title="Entrar">
-      <form className="stack" style={{ gap: 12 }} onSubmit={submit}>
-        <input
-          className="text-input"
-          type="email"
-          autoComplete="email"
-          placeholder="E-mail"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className="text-input"
-          type="password"
-          autoComplete="current-password"
-          placeholder="Senha"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <div style={{ fontSize: 14, color: COLORS.alertText }}>{error}</div>}
-        <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.6 : 1 }}>
-          {loading ? 'Entrando…' : 'Entrar'}
-        </button>
-      </form>
-    </FullScreen>
+    <div className="login">
+      <div className="login__box">
+        <header className="login__brand">
+          <div className="login__name">
+            Enddy <em>&amp;</em> Bento
+          </div>
+          <div className="label">gastos a dois</div>
+        </header>
+
+        <form className="card login__card" onSubmit={submit}>
+          <h1 className="login__title serif">Entrar</h1>
+          <input
+            className="text-input"
+            type="email"
+            autoComplete="email"
+            placeholder="E-mail"
+            aria-label="E-mail"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="text-input"
+            type="password"
+            autoComplete="current-password"
+            placeholder="Senha"
+            aria-label="Senha"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && (
+            <div role="alert" style={{ fontSize: 'var(--text-sm)', color: COLORS.alertText }}>
+              {error}
+            </div>
+          )}
+          <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.6 : 1 }}>
+            {loading ? 'Entrando…' : 'Entrar'}
+          </button>
+        </form>
+
+        <div className="login__legend">
+          {PERSON_IDS.map((id) => (
+            <span key={id}>
+              <Dot color={PEOPLE[id].color} size={9} />
+              {id === 'casal' ? 'Casal · conta conjunta' : PEOPLE[id].name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

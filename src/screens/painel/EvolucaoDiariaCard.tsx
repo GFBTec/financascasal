@@ -27,20 +27,30 @@ export function EvolucaoDiariaCard({ monthKey, monthExpenses, isCurrentMonth }: 
 
   const colorFor = (id: PersonId) => (TWEAKS.dailyMode === 'total' ? COLORS.ink : PEOPLE[id].color);
 
+  const average = monthTotal / Math.max(1, today);
+  // A linha de média só aparece se houver gastos e se couber na escala do gráfico.
+  const showAverage = average > 0 && average <= cap;
+
   const hovered = hoverDay ? points[hoverDay - 1] : null;
   const info = hovered
     ? `${hovered.day} de ${month} · Enddy ${formatBRL(hovered.enddy)} · Bento ${formatBRL(hovered.bento)} · Casal ${formatBRL(hovered.casal)}`
-    : `Média de ${formatBRL(monthTotal / Math.max(1, today))} por dia`;
+    : `Média de ${formatBRL(average)} por dia`;
 
   return (
     <Card>
       <div className="row-between" style={{ alignItems: 'baseline' }}>
         <div className="label">Evolução diária</div>
-        <div style={{ fontSize: 13.5 }}>{info}</div>
+        <div className="daily__info">{info}</div>
       </div>
 
       <div className="stack" style={{ gap: 8 }} onMouseLeave={() => setHoverDay(null)}>
-        <div className="daily__bars">
+        <div className="daily__plot">
+          {showAverage && (
+            <div className="daily__avg" style={{ bottom: `${(average / cap) * 100}%` }} aria-hidden="true">
+              <span>média {formatShortBRL(average)}</span>
+            </div>
+          )}
+          <div className="daily__bars">
           {points.map((p) => {
             const height = (Math.min(p.total, cap) / cap) * 100;
             const future = isCurrentMonth && p.day > today;
@@ -65,6 +75,7 @@ export function EvolucaoDiariaCard({ monthKey, monthExpenses, isCurrentMonth }: 
               </div>
             );
           })}
+          </div>
         </div>
         <div className="daily__axis">
           {points.map((p) => {
@@ -79,7 +90,15 @@ export function EvolucaoDiariaCard({ monthKey, monthExpenses, isCurrentMonth }: 
         </div>
       </div>
 
-      <PeopleLegend />
+      <div className="row" style={{ flexWrap: 'wrap', gap: '8px 16px' }}>
+        <PeopleLegend />
+        <span className="legend daily__avg-legend">
+          <span>
+            <i aria-hidden="true" />
+            Média diária
+          </span>
+        </span>
+      </div>
     </Card>
   );
 }

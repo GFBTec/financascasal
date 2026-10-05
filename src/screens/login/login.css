@@ -1,0 +1,54 @@
+.login {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+.login__box {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
+}
+.login__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.login__name {
+  font-family: var(--font-serif);
+  font-size: clamp(44px, 10vw, 60px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.login__name em {
+  color: var(--brand-amp);
+}
+.login__card {
+  gap: 12px;
+}
+.login__title {
+  margin: 0 0 4px;
+  font-size: var(--text-title);
+  line-height: 1;
+}
+.login__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+}
+.login__legend > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}

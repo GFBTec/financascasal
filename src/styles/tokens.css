@@ -1,41 +1,85 @@
-/* Tokens visuais — seção 1 da especificação (docs/ESPECIFICACAO.md). */
+/* Tokens visuais — docs/ESPECIFICACAO.md + v2 (cores de pessoa exclusivas, marca neutra). */
 :root {
-  /* Superfícies e texto */
+  /* ---------- Superfícies e texto ---------- */
   --bg: #f3eee4;
   --card: #fbf8f1;
   --field: #fffdf8;
   --ink: #1e1a15;
+  --ink-hover: #3a332b; /* hover do botão primário */
+  --ink-soft: #4a433b; /* texto secundário forte, legendas */
   --muted: #6e655a;
+  --brand-amp: #8a7f72; /* "&" da marca */
+  --tile: rgba(30, 26, 21, 0.06); /* fundo dos ícones de categoria */
   --line: rgba(30, 26, 21, 0.1);
   --line-strong: rgba(30, 26, 21, 0.14);
   --overlay: rgba(30, 26, 21, 0.42);
   --on-dark-muted: rgba(251, 248, 241, 0.72);
+  --focus: rgba(30, 26, 21, 0.45);
 
-  /* Pessoas */
+  /* ---------- Pessoas (exclusivas: não usar em mais nada) ---------- */
   --enddy: oklch(0.6 0.15 38);
   --bento: oklch(0.42 0.07 230);
   --casal: oklch(0.55 0.1 160);
   --casal-on-dark: oklch(0.78 0.1 160);
 
-  /* Estados */
-  --alert: oklch(0.58 0.19 27);
-  --alert-text: oklch(0.5 0.18 25);
-  --warn: oklch(0.78 0.13 75);
+  /* ---------- Status (vermelho = só atenção) ---------- */
+  --pago: oklch(0.68 0.17 150);
+  --pago-text: oklch(0.45 0.14 150);
+  --pago-soft: oklch(0.68 0.17 150 / 0.14);
+  --pendente: oklch(0.55 0.19 27);
+  --pendente-text: oklch(0.5 0.19 27);
+  --pendente-soft: oklch(0.55 0.19 27 / 0.12);
+  --status-neutral-bg: rgba(30, 26, 21, 0.07);
+  --status-neutral-fg: #3a332b;
 
-  /* Tipografia */
+  /* ---------- Degradês "tech" ---------- */
+  --grad-tech: linear-gradient(90deg, oklch(0.8 0.13 200), oklch(0.6 0.21 285));
+  --grad-tech-diag: linear-gradient(135deg, oklch(0.8 0.13 200), oklch(0.6 0.21 285));
+  --grad-over: linear-gradient(90deg, oklch(0.72 0.17 55), oklch(0.58 0.22 22));
+  --grad-good: linear-gradient(90deg, oklch(0.78 0.14 165), oklch(0.62 0.17 150));
+  --glow-tech: 0 0 10px oklch(0.62 0.2 270 / 0.35);
+  --glow-over: 0 0 10px oklch(0.6 0.22 22 / 0.45);
+
+  /* ---------- Assistente ---------- */
+  --ai: oklch(0.6 0.21 285);
+  --ai-text: oklch(0.45 0.18 285);
+  --ai-soft: oklch(0.6 0.21 285 / 0.06);
+  --ai-border: oklch(0.6 0.21 285 / 0.3);
+
+  /* ---------- Severidade das dicas (fundo / ícone) ---------- */
+  --sev-ok-bg: oklch(0.68 0.17 150 / 0.14);
+  --sev-ok-fg: oklch(0.45 0.14 150);
+  --sev-info-bg: oklch(0.6 0.21 285 / 0.12);
+  --sev-info-fg: oklch(0.48 0.2 285);
+  --sev-warn-bg: oklch(0.8 0.15 75 / 0.22);
+  --sev-warn-fg: oklch(0.5 0.12 65);
+  --sev-bad-bg: oklch(0.58 0.22 22 / 0.12);
+  --sev-bad-fg: oklch(0.5 0.19 27);
+
+  /* ---------- Tipografia ---------- */
   --font-serif: 'Instrument Serif', serif;
   --font-sans: 'Montserrat', system-ui, sans-serif;
   --font-mono: 'Geist Mono', monospace;
 
-  /* Forma */
-  --radius-card: 20px;
-  --radius-group: 16px;
-  --radius-input: 12px;
-  --radius-modal: 22px;
+  --text-label: 11px; /* rótulos mono em caixa alta, eixos (mínimo absoluto) */
+  --text-meta: 13px; /* metadados, legendas, chips */
+  --text-sm: 14px; /* corpo secundário, valores em lista */
+  --text-body: 15px; /* corpo, botões */
+  --text-lg: 18px; /* unidades ("por dia") */
+  --text-value: 24px; /* valores em cartões (serif) */
+  --text-title: 32px; /* títulos de modal, totais */
+  --text-display: clamp(40px, 5vw, 56px); /* título da tela */
+  --text-hero: clamp(52px, 7vw, 88px); /* valor do hero */
+
+  /* ---------- Forma: só 3 raios ---------- */
+  --radius-card: 22px; /* cartões, grupos de lista, modais */
+  --radius-ctl: 12px; /* inputs, botões, tiles, ícones */
+  --radius-pill: 999px;
+
   --gap: 16px;
   --sidebar-width: 248px;
 
-  /* Movimento */
+  /* ---------- Movimento ---------- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --dur-fast: 160ms;

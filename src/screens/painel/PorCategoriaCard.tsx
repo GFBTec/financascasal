@@ -1,7 +1,6 @@
-import { COLORS } from '../../domain/constants';
 import type { CategorySummary } from '../../domain/calculations';
 import { Card } from '../../components/ui/Card';
-import { Dot } from '../../components/ui/Dot';
+import { CategoryTile } from '../../components/ui/CategoryTile';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { formatBRL, formatShortBRL } from '../../lib/format';
 
@@ -30,19 +29,21 @@ export function PorCategoriaCard({ categories, onEditBudget }: PorCategoriaCardP
               : 'sem limite';
           return (
             <div key={c.id} className="cat-row" style={{ opacity: c.spent > 0 ? 1 : 0.55 }}>
-              <div className="cat-row__head">
-                <span style={{ alignSelf: 'center', display: 'flex' }}>
-                  <Dot color={c.color} size={9} square />
-                </span>
-                <span className="cat-row__name">{c.name}</span>
-                <span className="mono" style={{ fontSize: 13 }}>
-                  {formatBRL(c.spent)}
-                </span>
-                <span className="cat-row__sub" style={{ color: c.over ? COLORS.alertText : COLORS.muted }}>
-                  {sub}
-                </span>
+              <CategoryTile cat={c.id} />
+              <div className="cat-row__body">
+                <div className="cat-row__head">
+                  <span className="cat-row__name">{c.name}</span>
+                  <span className="money" style={{ fontSize: 'var(--text-sm)' }}>
+                    {formatBRL(c.spent)}
+                  </span>
+                  <span className={c.over ? 'cat-row__sub is-over' : 'cat-row__sub'}>{sub}</span>
+                </div>
+                <ProgressBar
+                  value={progress}
+                  fill={c.over ? 'var(--grad-over)' : 'var(--grad-tech)'}
+                  glow={c.spent > 0 ? (c.over ? 'var(--glow-over)' : 'var(--glow-tech)') : undefined}
+                />
               </div>
-              <ProgressBar value={progress} color={c.over ? COLORS.alert : c.color} />
             </div>
           );
         })}

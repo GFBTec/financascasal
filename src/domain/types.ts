@@ -1,3 +1,5 @@
+import type { LucideIcon } from 'lucide-react';
+
 export type PersonId = 'enddy' | 'bento' | 'casal';
 
 export type CategoryId =
@@ -45,7 +47,8 @@ export type Contributions = Record<string, Contribution>;
 export interface Category {
   id: CategoryId;
   name: string;
-  color: string;
+  /** Categorias são identificadas por ícone, não por cor (cor é exclusiva das pessoas). */
+  icon: LucideIcon;
 }
 
 export interface Person {

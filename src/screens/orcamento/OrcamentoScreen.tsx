@@ -6,7 +6,7 @@ import { useGastos } from '../../state/GastosContext';
 import { useAuth } from '../../state/AuthContext';
 import { useConfirm } from '../../hooks/useConfirm';
 import { Card } from '../../components/ui/Card';
-import { Dot } from '../../components/ui/Dot';
+import { CategoryTile } from '../../components/ui/CategoryTile';
 import { MoneyField } from '../../components/ui/MoneyField';
 import { formatBRL } from '../../lib/format';
 import { monthName } from '../../lib/date';
@@ -44,11 +44,11 @@ export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoS
       <Card dark style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 }}>
         <div className="stack" style={{ gap: 8 }}>
           <div className="label label--on-dark">Orçamento mensal</div>
-          <div className="serif" style={{ fontSize: 'clamp(44px,6vw,64px)', lineHeight: 0.9 }}>
+          <div className="serif nowrap" style={{ fontSize: 'clamp(44px,6vw,64px)', lineHeight: 0.9 }}>
             {formatBRL(budgetTotal(budgets))}
           </div>
         </div>
-        <div style={{ fontSize: 14, color: 'rgba(251,248,241,.78)', maxWidth: 280, textWrap: 'pretty' }}>
+        <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(251,248,241,.78)', maxWidth: 280, textWrap: 'pretty' }}>
           Vale para todos os meses. Em {month}, já foram {formatBRL(sumAmounts(monthExpenses))}.
         </div>
       </Card>
@@ -62,12 +62,12 @@ export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoS
             <div
               key={c.id}
               className="row"
-              style={{ gap: 14, padding: '12px 18px', borderTop: i ? '1px solid rgba(30,26,21,.08)' : 'none' }}
+              style={{ gap: 12, padding: '12px 16px', borderTop: i ? '1px solid rgba(30,26,21,.08)' : 'none' }}
             >
-              <Dot color={c.color} size={10} square />
+              <CategoryTile cat={c.id} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 500 }}>{c.name}</div>
-                <div style={{ fontSize: 12.5, color: over ? COLORS.alertText : COLORS.muted }}>
+                <div style={{ fontSize: 'var(--text-body)', fontWeight: 600 }}>{c.name}</div>
+                <div style={{ fontSize: 'var(--text-meta)', color: over ? COLORS.alertText : COLORS.muted }}>
                   {over
                     ? `${formatBRL(spent)} gastos · passou ${formatBRL(spent - budget)}`
                     : `${formatBRL(spent)} gastos em ${month}`}
@@ -84,7 +84,7 @@ export function OrcamentoScreen({ monthKey, monthExpenses, onToast }: OrcamentoS
       </Card>
 
       <section className="row" style={{ flexWrap: 'wrap', padding: '6px 2px' }}>
-        <span className="muted" style={{ fontSize: 13, flex: '1 1 200px' }}>
+        <span className="meta" style={{ flex: '1 1 200px' }}>
           Conectado como {email} ·{' '}
           <button type="button" className="btn-link" onClick={signOut}>
             Sair

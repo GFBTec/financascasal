@@ -17,6 +17,17 @@ Especificação completa em [docs/ESPECIFICACAO.md](docs/ESPECIFICACAO.md); o pr
 
 Segurança: todas as tabelas usam RLS; só e-mails em `members` leem ou gravam dados.
 
+### Assistente do mês (v2)
+
+1. Rode [supabase/migrations/20261005120000_assistente.sql](supabase/migrations/20261005120000_assistente.sql)
+   no SQL Editor (cria `settings` com o dia de pagamento e `ai_requests` para o limite de perguntas).
+2. Publique a Edge Function [supabase/functions/assistente](supabase/functions/assistente/index.ts)
+   (CLI: `supabase functions deploy assistente`, ou pelo painel em **Edge Functions → Deploy a new function**).
+3. Cadastre a chave da Anthropic **só no servidor**: **Edge Functions → Secrets → `ANTHROPIC_API_KEY`**.
+   Nunca coloque essa chave no front ou na Vercel.
+
+As dicas automáticas e o cálculo "pode gastar por dia" funcionam sem a função; só o campo de pergunta depende dela.
+
 ## Comandos
 
 ```bash

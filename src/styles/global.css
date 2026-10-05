@@ -10,25 +10,26 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: var(--ink);
 }
-a:hover {
-  color: var(--enddy);
-}
 
 input,
 button {
   font-family: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
 button {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+  font-variant-numeric: tabular-nums;
   -webkit-tap-highlight-color: transparent;
   transition:
     background-color var(--dur-fast) ease,
@@ -42,11 +43,15 @@ button {
 button:active:not(:disabled) {
   transform: scale(0.97);
 }
+button:disabled {
+  cursor: default;
+}
 
+/* Anel de foco neutro (a cor terracota é só da Enddy). */
 button:focus-visible,
-input:focus {
-  outline: 2px solid oklch(0.6 0.15 38 / 0.5);
-  outline-offset: 1px;
+input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 input {
@@ -54,6 +59,13 @@ input {
     border-color var(--dur-fast) ease,
     box-shadow var(--dur-fast) ease,
     background-color var(--dur-fast) ease;
+}
+
+/* Ícones Lucide: traço arredondado. */
+.lucide {
+  flex: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ---------- Entradas de tela ---------- */
@@ -109,13 +121,11 @@ input {
 /* ---------- Tipografia ---------- */
 .label {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-label);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
-}
-.label--small {
-  font-size: 11px;
+  white-space: nowrap;
 }
 .label--on-dark {
   color: var(--on-dark-muted);
@@ -129,6 +139,25 @@ input {
 }
 .muted {
   color: var(--muted);
+}
+.meta {
+  font-size: var(--text-meta);
+  color: var(--muted);
+}
+/* Valor monetário em listas: Montserrat 600. */
+.money {
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* Valor em cartões: Instrument Serif. */
+.value {
+  font-family: var(--font-serif);
+  font-size: var(--text-value);
+  line-height: 1;
+  white-space: nowrap;
+}
+.nowrap {
+  white-space: nowrap;
 }
 
 /* ---------- Layout utilitário ---------- */
@@ -174,57 +203,69 @@ input {
 
 /* ---------- Botões ---------- */
 .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
   background: var(--ink);
   color: var(--card);
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 13px 18px;
+  border-radius: var(--radius-ctl);
+  font-size: var(--text-body);
+  font-weight: 600;
   text-align: center;
-  transition: background 0.15s;
 }
 .btn-primary:hover {
-  background: var(--enddy);
+  background: var(--ink-hover);
 }
 .btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-ctl);
   border: 1px solid rgba(30, 26, 21, 0.16);
-  font-size: 13.5px;
+  font-size: var(--text-sm);
 }
 .btn-outline:hover {
   background: rgba(30, 26, 21, 0.05);
 }
 .btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid oklch(0.55 0.18 25 / 0.4);
-  color: var(--alert-text);
-  font-size: 13.5px;
+  border-radius: var(--radius-ctl);
+  border: 1px solid oklch(0.55 0.19 27 / 0.4);
+  color: var(--pendente-text);
+  font-size: var(--text-sm);
 }
 .btn-danger:hover {
-  background: oklch(0.55 0.18 25 / 0.08);
+  background: var(--pendente-soft);
 }
 .btn-link {
-  font-size: 13px;
+  font-size: var(--text-meta);
   color: var(--muted);
   text-decoration: underline;
   text-underline-offset: 3px;
+  white-space: nowrap;
 }
 .btn-link:hover {
   color: var(--ink);
 }
 .icon-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  flex: none;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 22px;
   color: var(--muted);
 }
 .icon-btn:hover {
   background: rgba(30, 26, 21, 0.07);
+  color: var(--ink);
 }
 
 /* ---------- Pontos de cor e legendas ---------- */
@@ -241,27 +282,45 @@ input {
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
-  font-size: 12.5px;
-  color: var(--muted);
+  gap: 8px 16px;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
 }
 .legend > span {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+}
+
+/* ---------- Tile de ícone de categoria ---------- */
+.cat-tile {
+  flex: none;
+  width: var(--tile-size, 36px);
+  height: var(--tile-size, 36px);
+  border-radius: var(--radius-ctl);
+  display: grid;
+  place-items: center;
+  background: var(--tile);
+  color: var(--ink);
 }
 
 /* ---------- Chips selecionáveis ---------- */
 .chip {
   flex: none;
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 13.5px;
+  padding: 8px 13px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-meta);
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 7px;
   border: 1px solid var(--line-strong);
   color: var(--ink);
+  white-space: nowrap;
+}
+.chip:hover {
+  background: rgba(30, 26, 21, 0.04);
 }
 .chip[aria-pressed='true'] {
   background: var(--ink);
@@ -275,123 +334,88 @@ input {
   gap: 4px;
   background: var(--card);
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 4px;
 }
 .segmented .chip {
   padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--text-sm);
   border: none;
 }
+/* Versão compacta (cartão Contas do mês): quebra linha em vez de rolar. */
 .segmented--small {
   align-self: flex-start;
   max-width: 100%;
-  overflow-x: auto;
+  flex-wrap: wrap;
   gap: 2px;
   padding: 3px;
+  background: rgba(30, 26, 21, 0.05);
+  border: none;
+  border-radius: 18px;
 }
 .segmented--small .chip {
   padding: 6px 10px;
-  font-size: 12.5px;
+  font-size: var(--text-meta);
   gap: 6px;
 }
 
-/* ---------- Lista suspensa de status (PAGO / PENDENTE) ---------- */
-.status-pill {
-  transition:
-    background-color var(--dur) ease,
-    color var(--dur) ease;
+/* ---------- Status PAGO / PENDENTE ---------- */
+.status-toggle {
+  flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 11px;
-  border-radius: 999px;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 118px;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--text-label);
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  transition:
+    background-color var(--dur) ease,
+    color var(--dur) ease;
 }
-.status-pill__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex: none;
+.status-pill.is-pago {
+  background: var(--status-neutral-bg);
+  color: var(--status-neutral-fg);
 }
-.status-pill__chevron {
-  font-size: 10px;
-  margin-left: 1px;
-  transition: transform 0.15s;
+.status-pill.is-pendente {
+  background: var(--pendente-soft);
+  color: var(--pendente-text);
 }
-.status-pill__chevron.is-open {
-  transform: rotate(180deg);
+.status-toggle:hover .status-pill.is-pago {
+  background: rgba(30, 26, 21, 0.11);
 }
-
-.status-select {
-  flex: none;
-  border-radius: 999px;
+.status-toggle:hover .status-pill.is-pendente {
+  background: oklch(0.55 0.19 27 / 0.18);
 }
-.status-select:active {
-  transform: scale(0.97);
+.status-pill__text {
+  display: inline;
 }
-.status-select:focus-visible {
-  outline-offset: 2px;
+/* Ícone gira ao trocar de estado. */
+.status-pill .lucide {
+  animation: status-icon-in var(--dur-slow) var(--ease-spring);
 }
-/* Largura fixa: PAGO e PENDENTE ficam alinhados na coluna. */
-.status-select .status-pill {
-  min-width: 118px;
-}
-.status-select .status-pill__chevron {
-  margin-left: auto;
-}
-
-.status-menu {
-  position: fixed;
-  z-index: 70;
-  min-width: 150px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(30, 26, 21, 0.16);
-  animation: status-menu-in var(--dur) var(--ease-spring);
-}
-.status-menu__option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 6px 8px;
-  border-radius: 10px;
-}
-.status-menu__option:hover,
-.status-menu__option:focus-visible {
-  background: rgba(30, 26, 21, 0.06);
-  outline: none;
-}
-.status-menu__check {
-  width: 14px;
-  font-size: 13px;
-  color: var(--ink);
-  text-align: center;
-}
-/* Usa `scale`/`translate` (não `transform`) para não brigar com o translateY(-100%) do menu aberto para cima. */
-@keyframes status-menu-in {
+@keyframes status-icon-in {
   from {
+    transform: rotate(-90deg) scale(0.4);
     opacity: 0;
-    scale: 0.94;
-    translate: 0 -4px;
   }
 }
 
 /* ---------- Barra de progresso ---------- */
 .progress {
-  height: var(--progress-h, 6px);
+  height: var(--progress-h, 8px);
   border-radius: 99px;
   background: var(--progress-track, rgba(30, 26, 21, 0.07));
   overflow: hidden;
@@ -400,37 +424,53 @@ input {
   display: block;
   height: 100%;
   border-radius: 99px;
-  transition: width 0.5s;
+  transition: width 0.5s var(--ease-out);
 }
 
 /* ---------- Campos ---------- */
 .text-input {
   width: 100%;
   padding: 13px 14px;
-  border-radius: var(--radius-input);
+  border-radius: var(--radius-ctl);
   border: 1px solid var(--line-strong);
   background: var(--field);
-  font-size: 15px;
+  font-size: var(--text-body);
   color: var(--ink);
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--ink);
 }
 .money-field {
   display: flex;
   align-items: center;
   gap: 6px;
   border: 1px solid var(--line-strong);
-  border-radius: 10px;
+  border-radius: var(--radius-ctl);
   padding: 0 12px;
   background: var(--field);
 }
+.money-field:focus-within {
+  border-color: var(--ink);
+}
 .money-field > span {
-  font-size: 13px;
+  font-size: var(--text-meta);
   color: var(--muted);
 }
 .money-field > input {
   all: unset;
-  width: var(--money-w, 72px);
+  width: var(--money-w, 76px);
   padding: 10px 0;
   text-align: right;
-  font-family: var(--font-mono);
-  font-size: 14.5px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 819.98px) {
+  /* iOS dá zoom automático em campos com fonte < 16px. */
+  .text-input,
+  .money-field > input {
+    font-size: 16px;
+  }
 }

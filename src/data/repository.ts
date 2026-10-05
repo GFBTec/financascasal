@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { DEFAULT_CONTRIBUTION, DEFAULT_CONTRIBUTION_KEY, DEFAULT_STATUS } from '../domain/constants';
+import { DEFAULT_CONTRIBUTION, DEFAULT_CONTRIBUTION_KEY, DEFAULT_PAYDAY, DEFAULT_STATUS } from '../domain/constants';
 import type { Budgets, CategoryId, Contribution, Contributions, Expense } from '../domain/types';
 
 /** Acesso ao Supabase. Converte entre as linhas do banco e os tipos do app. */
@@ -69,13 +69,28 @@ export interface RemoteData {
   /** Só as categorias salvas no banco; o restante usa o padrão. */
   budgets: Partial<Budgets>;
   contribs: Contributions;
+  payday: number;
+}
+
+/**
+ * Dia de pagamento do casal. Tolerante: se a tabela `settings` ainda não existir
+ * (migration da v2 não aplicada), usa o padrão em vez de impedir o app de abrir.
+ */
+async function fetchPayday(): Promise<number> {
+  const { data, error } = await supabase.from('settings').select('payday').eq('id', 1).maybeSingle();
+  if (error) {
+    console.warn('settings indisponível; usando dia de pagamento padrão', error);
+    return DEFAULT_PAYDAY;
+  }
+  return Number(data?.payday) || DEFAULT_PAYDAY;
 }
 
 export async function fetchAll(): Promise<RemoteData> {
-  const [expenses, budgetRows, contribRows] = await Promise.all([
+  const [expenses, budgetRows, contribRows, payday] = await Promise.all([
     fetchExpenses(),
     supabase.from('budgets').select('cat, amount').then(check),
     supabase.from('contributions').select('month_key, enddy, bento').then(check),
+    fetchPayday(),
   ]);
 
   const budgets: Partial<Budgets> = {};
@@ -86,7 +101,24 @@ export async function fetchAll(): Promise<RemoteData> {
     contribs[r.month_key] = { enddy: Number(r.enddy), bento: Number(r.bento) };
   }
 
-  return { expenses, budgets, contribs };
+  return { expenses, budgets, contribs, payday };
+}
+
+export async function upsertPayday(payday: number) {
+  check(await supabase.from('settings').upsert({ id: 1, payday }));
+}
+
+/**
+ * Pergunta ao assistente com IA (Supabase Edge Function `assistente`).
+ * A chave da Anthropic fica só no servidor.
+ */
+export async function askAssistant(pergunta: string, contexto: unknown): Promise<string> {
+  const { data, error } = await supabase.functions.invoke<{ resposta?: string; erro?: string }>('assistente', {
+    body: { pergunta, contexto },
+  });
+  if (error) throw error;
+  if (!data?.resposta) throw new Error(data?.erro ?? 'Resposta vazia do assistente');
+  return data.resposta;
 }
 
 export async function upsertExpense(e: Expense) {
@@ -123,7 +155,7 @@ export async function isMember(): Promise<boolean> {
 /** Chama `onChange` quando qualquer tabela muda (inclusive por outro aparelho). */
 export function subscribeToChanges(onChange: () => void) {
   const channel = supabase.channel('gastos-a-dois');
-  for (const table of ['expenses', 'budgets', 'contributions']) {
+  for (const table of ['expenses', 'budgets', 'contributions', 'settings']) {
     channel.on('postgres_changes', { event: '*', schema: 'public', table }, onChange);
   }
   channel.subscribe();

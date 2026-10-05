@@ -7,8 +7,8 @@ import { Dot } from '../../components/ui/Dot';
 import { PersonFilter, type PersonFilterValue } from '../../components/ui/PersonFilter';
 import { formatBRL, plural } from '../../lib/format';
 
-const SIZE = 136;
-const STROKE = 18;
+const SIZE = 104;
+const STROKE = 12;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 /** Espaço entre as fatias, em px ao longo do arco. */
@@ -49,7 +49,7 @@ export function ContasStatusCard({ monthExpenses }: { monthExpenses: Expense[] }
   const center = hovered ? totals[hovered] : null;
 
   return (
-    <Card style={{ gap: 16 }}>
+    <Card className="contas-card" style={{ gap: 16 }}>
       <div className="label">Contas do mês</div>
       <PersonFilter small value={who} onChange={setWho} />
 
@@ -72,7 +72,7 @@ export function ContasStatusCard({ monthExpenses }: { monthExpenses: Expense[] }
                 r={RADIUS}
                 fill="none"
                 stroke={STATUSES[a.id].color}
-                strokeWidth={hovered === a.id ? STROKE + 4 : STROKE}
+                strokeWidth={hovered === a.id ? STROKE + 3 : STROKE}
                 strokeDasharray={a.dash}
                 strokeDashoffset={a.offset}
                 opacity={hovered && hovered !== a.id ? 0.35 : 1}
@@ -86,10 +86,10 @@ export function ContasStatusCard({ monthExpenses }: { monthExpenses: Expense[] }
               </circle>
             ))}
           </g>
-          <text x="50%" y="48%" textAnchor="middle" className="status-chart__value">
+          <text x="50%" y="51%" textAnchor="middle" className="status-chart__value">
             {center ? center.count : `${totals.pago.count}/${count}`}
           </text>
-          <text x="50%" y="63%" textAnchor="middle" className="status-chart__caption">
+          <text x="50%" y="67%" textAnchor="middle" className="status-chart__caption">
             {hovered === 'pendente' ? (center!.count === 1 ? 'pendente' : 'pendentes') : center?.count === 1 ? 'paga' : 'pagas'}
           </text>
         </svg>
@@ -105,13 +105,13 @@ export function ContasStatusCard({ monthExpenses }: { monthExpenses: Expense[] }
             >
               <Dot color={STATUSES[id].color} size={10} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 500 }}>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>
                   {STATUSES[id].label}{' '}
-                  <span className="muted" style={{ fontSize: 12.5, fontWeight: 400 }}>
+                  <span className="meta nowrap" style={{ fontWeight: 400 }}>
                     · {contas(totals[id].count)}
                   </span>
                 </div>
-                <div className="mono" style={{ fontSize: 13.5, marginTop: 2 }}>
+                <div className="money" style={{ fontSize: 'var(--text-sm)', marginTop: 2 }}>
                   {formatBRL(totals[id].total)}
                 </div>
               </div>

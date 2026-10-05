@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { X } from 'lucide-react';
 import './Modal.css';
 
 interface ModalProps {
@@ -49,7 +50,7 @@ export function Modal({ title, onClose, maxWidth = 540, children }: ModalProps) 
         <div className="row-between">
           <h2 className="modal-title serif">{title}</h2>
           <button type="button" className="icon-btn modal-close" aria-label="Fechar" onClick={requestClose}>
-            ×
+            <X size={22} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </div>
         {children}

@@ -1,3 +1,19 @@
+import {
+  Car,
+  Check,
+  Clock,
+  Ellipsis,
+  Gift,
+  HeartPulse,
+  House,
+  PawPrint,
+  Plane,
+  Receipt,
+  ShoppingCart,
+  Ticket,
+  Utensils,
+  type LucideIcon,
+} from 'lucide-react';
 import type {
   Budgets,
   Category,
@@ -10,17 +26,17 @@ import type {
 } from './types';
 
 export const CATEGORIES: Category[] = [
-  { id: 'comida', name: 'Comida', color: 'oklch(0.66 0.13 60)' },
-  { id: 'mercado', name: 'Mercado', color: 'oklch(0.58 0.11 145)' },
-  { id: 'transporte', name: 'Transporte', color: 'oklch(0.56 0.11 260)' },
-  { id: 'lazer', name: 'Lazer', color: 'oklch(0.58 0.14 340)' },
-  { id: 'viagem', name: 'Viagem', color: 'oklch(0.60 0.09 195)' },
-  { id: 'moradia', name: 'Moradia', color: 'oklch(0.42 0.04 60)' },
-  { id: 'contas', name: 'Contas', color: 'oklch(0.70 0.12 90)' },
-  { id: 'saude', name: 'Saúde', color: 'oklch(0.58 0.16 18)' },
-  { id: 'presentes', name: 'Presentes', color: 'oklch(0.56 0.13 300)' },
-  { id: 'pets', name: 'Pets', color: 'oklch(0.55 0.09 115)' },
-  { id: 'outros', name: 'Outros', color: 'oklch(0.62 0.02 70)' },
+  { id: 'comida', name: 'Comida', icon: Utensils },
+  { id: 'mercado', name: 'Mercado', icon: ShoppingCart },
+  { id: 'transporte', name: 'Transporte', icon: Car },
+  { id: 'lazer', name: 'Lazer', icon: Ticket },
+  { id: 'viagem', name: 'Viagem', icon: Plane },
+  { id: 'moradia', name: 'Moradia', icon: House },
+  { id: 'contas', name: 'Contas', icon: Receipt },
+  { id: 'saude', name: 'Saúde', icon: HeartPulse },
+  { id: 'presentes', name: 'Presentes', icon: Gift },
+  { id: 'pets', name: 'Pets', icon: PawPrint },
+  { id: 'outros', name: 'Outros', icon: Ellipsis },
 ];
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.id, c])) as Record<
@@ -28,6 +44,7 @@ export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]))
   Category
 >;
 
+/** Cor de pessoa é exclusiva: laranja = Enddy, azul = Bento, verde = Casal. Não usar em mais nada. */
 export const PEOPLE: Record<PersonId, Person> = {
   enddy: { id: 'enddy', name: 'Enddy', color: 'oklch(0.60 0.15 38)', soft: 'oklch(0.60 0.15 38 / 0.13)' },
   bento: { id: 'bento', name: 'Bento', color: 'oklch(0.42 0.07 230)', soft: 'oklch(0.42 0.07 230 / 0.13)' },
@@ -40,10 +57,19 @@ export const PAYMENT_METHODS: PaymentMethod[] = ['Crédito', 'Débito', 'Pix', '
 
 export const DEFAULT_STATUS: ExpenseStatus = 'pago';
 
-/** Rótulo e cores (texto forte + fundo claro) de cada status. */
-export const STATUSES: Record<ExpenseStatus, { label: string; color: string; bg: string }> = {
-  pago: { label: 'Pago', color: 'oklch(0.45 0.14 150)', bg: 'oklch(0.93 0.06 150)' },
-  pendente: { label: 'Pendente', color: 'oklch(0.50 0.19 27)', bg: 'oklch(0.93 0.05 25)' },
+/** Rótulo, ícone e cores de cada status (tokens em src/styles/tokens.css). */
+export const STATUSES: Record<
+  ExpenseStatus,
+  { label: string; icon: LucideIcon; color: string; text: string; soft: string }
+> = {
+  pago: { label: 'Pago', icon: Check, color: 'var(--pago)', text: 'var(--pago-text)', soft: 'var(--pago-soft)' },
+  pendente: {
+    label: 'Pendente',
+    icon: Clock,
+    color: 'var(--pendente)',
+    text: 'var(--pendente-text)',
+    soft: 'var(--pendente-soft)',
+  },
 };
 
 export const STATUS_IDS: ExpenseStatus[] = ['pago', 'pendente'];
@@ -65,15 +91,16 @@ export const DEFAULT_BUDGETS: Budgets = {
 export const DEFAULT_CONTRIBUTION_KEY = '0000-00';
 export const DEFAULT_CONTRIBUTION: Contribution = { enddy: 2500, bento: 2000 };
 
-/** Cores de estado usadas fora do CSS (valores dinâmicos). Espelham src/styles/tokens.css. */
+/** Dia em que a conta do casal é abastecida (1–28). */
+export const DEFAULT_PAYDAY = 5;
+
+/** Cores usadas em estilos dinâmicos. Apontam para os tokens de src/styles/tokens.css. */
 export const COLORS = {
-  ink: '#1E1A15',
-  muted: '#6E655A',
-  card: '#FBF8F1',
+  ink: 'var(--ink)',
+  muted: 'var(--muted)',
+  card: 'var(--card)',
   neutralDot: 'rgba(30,26,21,.3)',
   casalOnDark: 'oklch(0.78 0.10 160)',
-  alert: 'oklch(0.58 0.19 27)',
   alertOnDark: 'oklch(0.65 0.18 28)',
-  alertText: 'oklch(0.50 0.18 25)',
-  warn: 'oklch(0.78 0.13 75)',
+  alertText: 'var(--pendente-text)',
 };

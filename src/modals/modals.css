@@ -4,6 +4,7 @@
   gap: 8px;
 }
 
+/* ---------- 1. Valor ---------- */
 .amount-field {
   display: flex;
   align-items: baseline;
@@ -13,7 +14,7 @@
 }
 .amount-field > span {
   font-family: var(--font-serif);
-  font-size: 34px;
+  font-size: 32px;
   color: var(--muted);
 }
 .amount-field > input {
@@ -21,54 +22,155 @@
   flex: 1;
   min-width: 0;
   font-family: var(--font-serif);
-  font-size: 58px;
+  font-size: 56px;
   line-height: 1.05;
   color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
+/* ---------- 2. Quem gastou ---------- */
+.who-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
 .who-option {
-  flex: 1;
   min-height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius-ctl);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  font-size: 15px;
-  font-weight: 500;
+  gap: 8px;
+  font-size: var(--text-body);
+  font-weight: 600;
   border: 1.5px solid var(--line-strong);
   background: var(--field);
+  white-space: nowrap;
+}
+.who-option:hover {
+  border-color: rgba(30, 26, 21, 0.3);
 }
 
-.status-option {
-  flex: 1;
-  min-height: 44px;
-  border-radius: 12px;
+/* ---------- 4. Categoria: grade de 4 colunas ---------- */
+.cat-grid {
   display: grid;
-  place-items: center;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.cat-option {
+  height: 64px;
+  min-width: 0;
+  border-radius: var(--radius-ctl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 4px;
+  background: var(--tile);
+  color: var(--ink);
+  font-size: var(--text-meta);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  border: 1.5px solid var(--line-strong);
-  background: var(--field);
+}
+.cat-option > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cat-option:hover {
+  background: rgba(30, 26, 21, 0.1);
+}
+.cat-option[aria-checked='true'] {
+  background: var(--ink);
+  color: var(--card);
 }
 
-.chip--lg {
-  padding: 9px 12px;
-  font-size: 14px;
+/* ---------- 5. Detalhes: data · pagamento · status ---------- */
+.details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
-.pay-options {
+.detail-btn {
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 10px;
+  border-radius: var(--radius-ctl);
+  border: 1.5px solid var(--line-strong);
+  background: var(--field);
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--text-meta);
+  font-weight: 600;
 }
-.chip--pay {
-  padding: 10px 12px;
-  border-radius: 10px;
+.detail-btn:hover {
+  border-color: rgba(30, 26, 21, 0.3);
+}
+.detail-btn.is-open {
+  border-color: var(--ink);
+}
+.detail-btn.is-pending {
+  background: var(--pendente-soft);
+  color: var(--pendente-text);
+}
+.detail-btn__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+.detail-btn__short {
+  display: none;
+}
+.detail-btn__chevron {
+  transition: transform var(--dur) var(--ease-spring);
+}
+.detail-btn.is-open .detail-btn__chevron {
+  transform: rotate(180deg);
+}
+
+.detail-panel {
+  animation: rise-in var(--dur) var(--ease-out) both;
+}
+.pay-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.option-btn {
+  min-height: 48px;
+  border-radius: var(--radius-ctl);
+  border: 1.5px solid var(--line-strong);
+  background: var(--field);
+  display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 7px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.option-btn:hover {
+  border-color: rgba(30, 26, 21, 0.3);
+}
+.option-btn[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
+}
+.option-btn.is-pendente[aria-pressed='true'] {
+  background: var(--pendente-soft);
+  border-color: var(--pendente);
+  color: var(--pendente-text);
 }
 
 .text-input[type='date'] {
@@ -80,20 +182,29 @@
   appearance: none;
 }
 
+/* ---------- 6. Ações ---------- */
+.modal-actions__delete {
+  border: none;
+  min-height: 48px;
+}
+.modal-actions__save {
+  margin-left: auto;
+  padding: 13px 28px;
+}
+
 /* ---------- Mobile (< 820px) ---------- */
 @media (max-width: 819.98px) {
-  /* Pagamento em grade de 3 colunas: nenhuma opção fica sozinha numa linha "quebrada". */
-  .pay-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .chip--pay {
-    min-height: 44px;
-  }
-
   /* iOS dá zoom automático em campos com fonte < 16px. */
   .modal .text-input {
     font-size: 16px;
+  }
+
+  .details {
+    gap: 6px;
+  }
+  .detail-btn {
+    padding: 0 8px;
+    gap: 5px;
   }
 
   /* Botões de ação sempre visíveis no rodapé do bottom sheet. */
@@ -102,13 +213,38 @@
     /* O sticky respeita o padding do sheet; o deslocamento negativo encosta na borda real. */
     bottom: calc(-24px - env(safe-area-inset-bottom));
     z-index: 1;
-    /* Encosta no fim do sheet, compensando o padding inferior (que inclui a área segura). */
     margin: 0 -24px calc(-24px - env(safe-area-inset-bottom));
     padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
     background: var(--card);
     border-top: 1px solid var(--line);
   }
-  .modal-actions .btn-primary {
+  .modal-actions__save {
     flex: 1;
+  }
+}
+
+@media (max-width: 440px) {
+  /* Data em forma curta ("Hoje") para caber na linha de 3 botões. */
+  .detail-btn__full {
+    display: none;
+  }
+  .detail-btn__short {
+    display: inline;
+  }
+}
+
+@media (max-width: 400px) {
+  .detail-btn > .lucide:first-child {
+    display: none;
+  }
+  .cat-option {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 340px) {
+  /* Celulares bem pequenos: 3 colunas de categoria evitam cortar os nomes. */
+  .cat-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

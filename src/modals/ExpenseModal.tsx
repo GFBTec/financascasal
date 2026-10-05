@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Calendar, ChevronDown, CreditCard, type LucideIcon } from 'lucide-react';
 import {
   CATEGORIES,
   COLORS,
@@ -11,11 +12,11 @@ import {
 } from '../domain/constants';
 import type { CategoryId, Expense, ExpenseStatus, PaymentMethod, PersonId } from '../domain/types';
 import { Modal } from '../components/ui/Modal';
-import { Chip } from '../components/ui/Chip';
 import { Dot } from '../components/ui/Dot';
 import { useConfirm } from '../hooks/useConfirm';
 import { maskCurrencyInput, parseAmount } from '../lib/money';
 import { uid } from '../lib/id';
+import { MONTHS_SHORT, WEEKDAYS, dateFromISO, toISODate } from '../lib/date';
 import './modals.css';
 
 interface ExpenseForm {
@@ -38,6 +39,8 @@ interface ExpenseModalProps {
   onSave: (expense: Expense) => void;
   onDelete: (id: string) => void;
 }
+
+type DetailPanel = 'date' | 'pay' | 'status';
 
 function initialForm(expense: Expense | undefined, defaultWho: PersonId, defaultDate: string): ExpenseForm {
   if (expense) {
@@ -64,15 +67,30 @@ function initialForm(expense: Expense | undefined, defaultWho: PersonId, default
   };
 }
 
+/** Rótulo completo ("Hoje, 5 out" · "sáb, 3 out") e curto para telas estreitas ("Hoje" · "3 out"). */
+function dateChipLabel(iso: string): { full: string; short: string } {
+  if (!iso) return { full: 'Escolher data', short: 'Data' };
+  const d = dateFromISO(iso);
+  const base = `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
+  const now = new Date();
+  const today = toISODate(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = toISODate(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  if (iso === today) return { full: `Hoje, ${base}`, short: 'Hoje' };
+  if (iso === yesterday) return { full: `Ontem, ${base}`, short: 'Ontem' };
+  return { full: `${WEEKDAYS[d.getDay()]}, ${base}`, short: base };
+}
+
 export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave, onDelete }: ExpenseModalProps) {
   const [form, setForm] = useState(() => initialForm(expense, defaultWho, defaultDate));
   const [error, setError] = useState('');
+  const [panel, setPanel] = useState<DetailPanel | null>(null);
   const del = useConfirm(() => expense && onDelete(expense.id));
 
   const set = (patch: Partial<ExpenseForm>) => {
     setError('');
     setForm((f) => ({ ...f, ...patch }));
   };
+  const togglePanel = (p: DetailPanel) => setPanel((cur) => (cur === p ? null : p));
 
   const save = () => {
     const amount = parseAmount(form.amount);
@@ -92,8 +110,11 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
     });
   };
 
+  const status = STATUSES[form.status];
+
   return (
     <Modal title={expense ? 'Editar gasto' : 'Novo gasto'} onClose={onClose}>
+      {/* 1. Valor */}
       <div className="amount-field">
         <span>R$</span>
         <input
@@ -106,9 +127,10 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
         />
       </div>
 
+      {/* 2. Quem gastou */}
       <div className="field">
-        <div className="label label--small">Quem gastou</div>
-        <div className="row">
+        <div className="label">Quem gastou</div>
+        <div className="who-options">
           {PERSON_IDS.map((id) => {
             const p = PEOPLE[id];
             const on = form.who === id;
@@ -118,7 +140,7 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
                 type="button"
                 className="who-option"
                 aria-pressed={on}
-                style={{ borderColor: on ? p.color : undefined, background: on ? p.soft : undefined }}
+                style={on ? { borderColor: p.color, background: p.soft } : undefined}
                 onClick={() => set({ who: id })}
               >
                 <Dot color={p.color} size={10} />
@@ -129,98 +151,185 @@ export function ExpenseModal({ expense, defaultWho, defaultDate, onClose, onSave
         </div>
       </div>
 
+      {/* 3. O quê + Local */}
       <div className="field">
-        <div className="label label--small">O quê</div>
+        <div className="label">O quê</div>
         <input
           className="text-input"
           value={form.desc}
           placeholder="ex: Jantar de sexta"
+          aria-label="Descrição"
           onChange={(e) => set({ desc: e.target.value })}
         />
         <input
           className="text-input"
           value={form.place}
           placeholder="Local (opcional) — ex: Padaria Real"
+          aria-label="Local"
           onChange={(e) => set({ place: e.target.value })}
         />
       </div>
 
+      {/* 4. Categoria: grade de 4 colunas */}
       <div className="field">
-        <div className="label label--small">Categoria</div>
-        <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
-          {CATEGORIES.map((c) => (
-            <Chip
-              key={c.id}
-              className="chip--lg"
-              label={c.name}
-              dot={c.color}
-              selected={form.cat === c.id}
-              onClick={() => set({ cat: c.id })}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="row" style={{ flexWrap: 'wrap', gap: 16, alignItems: 'flex-start' }}>
-        <div className="field" style={{ flex: '1 1 160px' }}>
-          <div className="label label--small">Quando</div>
-          <input
-            className="text-input"
-            type="date"
-            value={form.date}
-            onChange={(e) => set({ date: e.target.value })}
-          />
-        </div>
-        <div className="field" style={{ flex: '2 1 260px' }}>
-          <div className="label label--small">Pagamento</div>
-          <div className="pay-options">
-            {PAYMENT_METHODS.map((p) => (
-              <Chip
-                key={p}
-                className="chip--pay"
-                label={p}
-                selected={form.pay === p}
-                onClick={() => set({ pay: p })}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="field">
-        <div className="label label--small">Status</div>
-        <div className="row">
-          {STATUS_IDS.map((id) => {
-            const s = STATUSES[id];
-            const on = form.status === id;
+        <div className="label">Categoria</div>
+        <div className="cat-grid" role="radiogroup" aria-label="Categoria">
+          {CATEGORIES.map((c) => {
+            const Icon = c.icon;
+            const on = form.cat === c.id;
             return (
               <button
-                key={id}
+                key={c.id}
                 type="button"
-                className="status-option"
-                aria-pressed={on}
-                style={on ? { color: s.color, background: s.bg, borderColor: s.color } : undefined}
-                onClick={() => set({ status: id })}
+                role="radio"
+                aria-checked={on}
+                className="cat-option"
+                onClick={() => set({ cat: c.id })}
               >
-                {s.label}
+                <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
+                <span>{c.name}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {error && <div style={{ fontSize: 14, color: COLORS.alertText }}>{error}</div>}
+      {/* 5. Detalhes: data · pagamento · status */}
+      <div className="field">
+        <div className="label">Detalhes</div>
+        <div className="details">
+          <DetailButton
+            icon={Calendar}
+            label={dateChipLabel(form.date).full}
+            shortLabel={dateChipLabel(form.date).short}
+            ariaLabel="Data"
+            open={panel === 'date'}
+            onClick={() => togglePanel('date')}
+          />
+          <DetailButton
+            icon={CreditCard}
+            label={form.pay}
+            ariaLabel="Pagamento"
+            open={panel === 'pay'}
+            onClick={() => togglePanel('pay')}
+          />
+          <DetailButton
+            icon={status.icon}
+            label={status.label}
+            ariaLabel="Status"
+            open={panel === 'status'}
+            pending={form.status === 'pendente'}
+            onClick={() => togglePanel('status')}
+          />
+        </div>
 
+        {panel === 'date' && (
+          <div className="detail-panel">
+            <input
+              className="text-input"
+              type="date"
+              value={form.date}
+              aria-label="Data do gasto"
+              onChange={(e) => set({ date: e.target.value })}
+            />
+          </div>
+        )}
+        {panel === 'pay' && (
+          <div className="detail-panel pay-grid">
+            {PAYMENT_METHODS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                className="option-btn"
+                aria-pressed={form.pay === p}
+                onClick={() => {
+                  set({ pay: p });
+                  setPanel(null);
+                }}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        )}
+        {panel === 'status' && (
+          <div className="detail-panel status-grid">
+            {STATUS_IDS.map((id) => {
+              const s = STATUSES[id];
+              const Icon = s.icon;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={`option-btn is-${id}`}
+                  aria-pressed={form.status === id}
+                  onClick={() => {
+                    set({ status: id });
+                    setPanel(null);
+                  }}
+                >
+                  <Icon size={16} strokeWidth={2} aria-hidden="true" />
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <div role="alert" style={{ fontSize: 'var(--text-sm)', color: COLORS.alertText }}>
+          {error}
+        </div>
+      )}
+
+      {/* 6. Ações */}
       <div className="row modal-actions">
         {expense && (
-          <button type="button" className="btn-danger" style={{ border: 'none', padding: '14px 16px' }} onClick={del.trigger}>
+          <button type="button" className="btn-danger modal-actions__delete" onClick={del.trigger}>
             {del.armed ? 'Confirmar exclusão' : 'Excluir'}
           </button>
         )}
-        <button type="button" className="btn-primary" style={{ marginLeft: 'auto', padding: '15px 26px' }} onClick={save}>
+        <button type="button" className="btn-primary modal-actions__save" onClick={save}>
           Salvar gasto
         </button>
       </div>
     </Modal>
+  );
+}
+
+interface DetailButtonProps {
+  icon: LucideIcon;
+  label: string;
+  /** Versão curta do rótulo para telas estreitas. */
+  shortLabel?: string;
+  ariaLabel: string;
+  open: boolean;
+  pending?: boolean;
+  onClick: () => void;
+}
+
+function DetailButton({ icon: Icon, label, shortLabel, ariaLabel, open, pending, onClick }: DetailButtonProps) {
+  return (
+    <button
+      type="button"
+      className={['detail-btn', open && 'is-open', pending && 'is-pending'].filter(Boolean).join(' ')}
+      aria-expanded={open}
+      aria-label={`${ariaLabel}: ${label}`}
+      onClick={onClick}
+    >
+      <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
+      <span className="detail-btn__text">
+        {shortLabel ? (
+          <>
+            <span className="detail-btn__full">{label}</span>
+            <span className="detail-btn__short">{shortLabel}</span>
+          </>
+        ) : (
+          label
+        )}
+      </span>
+      <ChevronDown className="detail-btn__chevron" size={14} strokeWidth={2} aria-hidden="true" />
+    </button>
   );
 }

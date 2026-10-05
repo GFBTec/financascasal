@@ -10,7 +10,8 @@ interface AuthContextValue {
   signOut: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+/** Exportado para montar telas com dados de exemplo em testes visuais. */
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 const signOut = () => {
   supabase.auth.signOut();

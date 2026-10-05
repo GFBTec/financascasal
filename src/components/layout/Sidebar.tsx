@@ -1,3 +1,4 @@
+import { LogOut, Plus } from 'lucide-react';
 import { PEOPLE } from '../../domain/constants';
 import type { Screen } from '../../domain/types';
 import { useAuth } from '../../state/AuthContext';
@@ -18,27 +19,31 @@ export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: Sideba
     <aside className="sidebar">
       <div className="sidebar__brand">
         <Brand />
-        <div className="label label--small">gastos a dois</div>
+        <div className="label">gastos a dois</div>
       </div>
 
       <nav className="sidebar__nav">
-        {NAV_ITEMS.map((n) => (
-          <button
-            key={n.id}
-            type="button"
-            className="sidebar__item"
-            aria-current={screen === n.id ? 'page' : undefined}
-            onClick={() => onNavigate(n.id)}
-          >
-            <span>{n.label}</span>
-            <span className="sidebar__hint">{n.id === 'gastos' ? monthCount : ''}</span>
-          </button>
-        ))}
+        {NAV_ITEMS.map((n) => {
+          const Icon = n.icon;
+          return (
+            <button
+              key={n.id}
+              type="button"
+              className="sidebar__item"
+              aria-current={screen === n.id ? 'page' : undefined}
+              onClick={() => onNavigate(n.id)}
+            >
+              <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
+              <span style={{ flex: 1 }}>{n.label}</span>
+              <span className="sidebar__hint">{n.id === 'gastos' ? monthCount : ''}</span>
+            </button>
+          );
+        })}
       </nav>
 
       <button type="button" className="btn-primary sidebar__new" onClick={onNewExpense}>
         <span>Novo gasto</span>
-        <span className="sidebar__plus">+</span>
+        <Plus className="sidebar__plus" size={20} strokeWidth={2} aria-hidden="true" />
       </button>
 
       <div className="sidebar__legend">
@@ -56,8 +61,8 @@ export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: Sideba
         </div>
         <div className="sidebar__account">
           <span title={email}>{email}</span>
-          <button type="button" className="btn-link" onClick={signOut}>
-            Sair
+          <button type="button" className="icon-btn sidebar__logout" aria-label="Sair" title="Sair" onClick={signOut}>
+            <LogOut size={16} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>

@@ -101,6 +101,25 @@ export interface MonthTotals {
   total: number;
 }
 
+/**
+ * Janela de meses do gráfico "Últimos 6 meses": termina no mês corrente; só se desloca
+ * quando o mês selecionado fica antes dela (aí ele vira o primeiro da janela).
+ * Retorna a chave do último mês da janela.
+ */
+export function monthWindowEnd(selected: string, current: string, count = 6) {
+  return selected < shiftMonth(current, -(count - 1)) ? shiftMonth(selected, count - 1) : current;
+}
+
+/**
+ * Total do mesmo período do mês anterior: no mês corrente compara até o mesmo dia;
+ * em meses fechados compara o mês anterior inteiro.
+ */
+export function previousPeriodTotal(all: Expense[], monthKey: string, today: Date, isCurrentMonth: boolean) {
+  const prev = expensesInMonth(all, shiftMonth(monthKey, -1));
+  const limited = isCurrentMonth ? prev.filter((e) => dayOfISO(e.date) <= today.getDate()) : prev;
+  return sumAmounts(limited);
+}
+
 /** Totais por pessoa dos `count` meses terminando em `monthKey` (mais antigo primeiro). */
 export function lastMonths(all: Expense[], monthKey: string, count = 6): MonthTotals[] {
   const rows: MonthTotals[] = [];

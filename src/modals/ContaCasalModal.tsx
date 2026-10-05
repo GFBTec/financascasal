@@ -24,17 +24,17 @@ export function ContaCasalModal({ monthKey, current, onClose, onSave }: ContaCas
 
   return (
     <Modal title="Conta do casal" onClose={onClose} maxWidth={440}>
-      <div className="muted" style={{ fontSize: 14, textWrap: 'pretty' }}>
+      <div className="meta" style={{ fontSize: 'var(--text-sm)', textWrap: 'pretty' }}>
         Depósito mensal de cada um. Vale a partir de {monthLabel(monthKey)}.
       </div>
 
       {CONTRIBUTORS.map((id) => (
         <div key={id} className="row" style={{ gap: 12 }}>
           <Dot color={PEOPLE[id].color} size={10} />
-          <span style={{ flex: 1, fontSize: 15, fontWeight: 500 }}>{PEOPLE[id].name}</span>
+          <span style={{ flex: 1, fontSize: 'var(--text-body)', fontWeight: 600 }}>{PEOPLE[id].name}</span>
           <MoneyField
             label={`Depósito de ${PEOPLE[id].name}`}
-            width={90}
+            width={100}
             value={values[id]}
             onChange={(v) => setValues((s) => ({ ...s, [id]: onlyDigits(v) }))}
           />
@@ -45,15 +45,15 @@ export function ContaCasalModal({ monthKey, current, onClose, onSave }: ContaCas
         className="row-between"
         style={{ alignItems: 'baseline', borderTop: '1px solid var(--line-strong)', paddingTop: 14 }}
       >
-        <span className="muted" style={{ fontSize: 14 }}>
+        <span className="meta" style={{ fontSize: 'var(--text-sm)' }}>
           Total na conta
         </span>
-        <span className="serif" style={{ fontSize: 30 }}>
+        <span className="serif nowrap" style={{ fontSize: 'var(--text-title)', lineHeight: 1 }}>
           {formatBRL(enddy + bento)}
         </span>
       </div>
 
-      <button type="button" className="btn-primary" style={{ padding: '15px 26px' }} onClick={() => onSave({ enddy, bento })}>
+      <button type="button" className="btn-primary" onClick={() => onSave({ enddy, bento })}>
         Salvar valor
       </button>
     </Modal>

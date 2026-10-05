@@ -9,9 +9,12 @@ interface GastosData {
   expenses: Expense[];
   budgets: Budgets;
   contribs: Contributions;
+  /** Dia em que a conta do casal é abastecida (1–28). */
+  payday: number;
 }
 
 interface GastosActions {
+  setPayday: (day: number) => void;
   /** Cria ou substitui (mesmo id) um gasto. */
   saveExpense: (expense: Expense) => void;
   deleteExpense: (id: string) => void;
@@ -28,9 +31,10 @@ export interface SyncError {
   message: string;
 }
 
-type GastosContextValue = GastosData & GastosActions & { syncError: SyncError | null };
+export type GastosContextValue = GastosData & GastosActions & { syncError: SyncError | null };
 
-const GastosContext = createContext<GastosContextValue | null>(null);
+/** Exportado para montar telas com dados de exemplo em testes visuais. */
+export const GastosContext = createContext<GastosContextValue | null>(null);
 
 const BUDGET_SAVE_DELAY = 600;
 const RELOAD_DELAY = 400;
@@ -46,6 +50,7 @@ export function GastosProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState<SyncError | null>(null);
   const reloadTimer = useRef<number | undefined>(undefined);
   const budgetTimers = useRef<Partial<Record<CategoryId, number>>>({});
+  const paydayTimer = useRef<number | undefined>(undefined);
 
   const reload = useCallback(async () => {
     try {
@@ -68,6 +73,7 @@ export function GastosProvider({ children }: { children: ReactNode }) {
     return () => {
       unsubscribe();
       window.clearTimeout(reloadTimer.current);
+      window.clearTimeout(paydayTimer.current);
       Object.values(timers).forEach((t) => window.clearTimeout(t));
     };
   }, [reload]);
@@ -103,6 +109,13 @@ export function GastosProvider({ children }: { children: ReactNode }) {
           () => sync(repo.upsertBudgets({ [cat]: value })),
           BUDGET_SAVE_DELAY,
         );
+      },
+      setPayday: (day) => {
+        const payday = Math.min(28, Math.max(1, Math.round(day)));
+        update((d) => ({ ...d, payday }));
+        // Os botões − / + costumam ser tocados em sequência: grava só o valor final.
+        window.clearTimeout(paydayTimer.current);
+        paydayTimer.current = window.setTimeout(() => sync(repo.upsertPayday(payday)), BUDGET_SAVE_DELAY);
       },
       setContribution: (monthKey, value) => {
         update((d) => ({ ...d, contribs: { ...d.contribs, [monthKey]: value } }));

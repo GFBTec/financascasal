@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import type { Screen } from '../../domain/types';
 import { NAV_ITEMS } from './nav';
 
@@ -23,12 +24,7 @@ export function TabBar({ screen, composing, onNavigate, onNewExpense }: TabBarPr
 
   return (
     <>
-      <button
-        type="button"
-        className={composing ? 'fab is-open' : 'fab'}
-        aria-label="Novo gasto"
-        onClick={handleNew}
-      >
+      <button type="button" className={composing ? 'fab is-open' : 'fab'} aria-label="Novo gasto" onClick={handleNew}>
         {burst > 0 && (
           <span key={burst} className="fab__fx" aria-hidden="true">
             <span className="fab__spin" />
@@ -36,22 +32,26 @@ export function TabBar({ screen, composing, onNavigate, onNewExpense }: TabBarPr
             <span className="fab__wave fab__wave--late" />
           </span>
         )}
-        <svg className="fab__icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-        </svg>
+        <Plus className="fab__icon" size={26} strokeWidth={2.2} aria-hidden="true" />
       </button>
       <nav className="tabbar">
-        {NAV_ITEMS.map((n) => (
-          <button
-            key={n.id}
-            type="button"
-            className="tabbar__item"
-            aria-current={screen === n.id ? 'page' : undefined}
-            onClick={() => onNavigate(n.id)}
-          >
-            {n.label}
-          </button>
-        ))}
+        {NAV_ITEMS.map((n) => {
+          const Icon = n.icon;
+          return (
+            <button
+              key={n.id}
+              type="button"
+              className="tabbar__item"
+              aria-current={screen === n.id ? 'page' : undefined}
+              onClick={() => onNavigate(n.id)}
+            >
+              <span className="tabbar__pill">
+                <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              {n.label}
+            </button>
+          );
+        })}
       </nav>
     </>
   );

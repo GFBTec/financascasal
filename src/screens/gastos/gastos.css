@@ -1,20 +1,52 @@
-.search-input {
-  flex: 1 1 220px;
+/* ---------- Filtros ---------- */
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.person-filter-scroll {
+  max-width: 100%;
+}
+
+/* Busca em pílula com ícone dentro do campo */
+.search {
+  flex: 1 1 240px;
   min-width: 0;
-  padding: 12px 16px;
-  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--line-strong);
   background: var(--card);
-  font-size: 14.5px;
+  color: var(--muted);
+  cursor: text;
+  transition: border-color var(--dur-fast) ease;
+}
+.search:focus-within {
+  border-color: var(--ink);
   color: var(--ink);
+}
+.search input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+.search input::placeholder {
+  color: var(--muted);
 }
 
 .chips-scroll {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 2px 2px 6px;
   margin: 0 -2px;
+  scrollbar-width: thin;
 }
 
 .list-summary {
@@ -22,38 +54,43 @@
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  padding: 4px 2px;
+  padding: 4px 2px 10px;
   border-bottom: 1px solid var(--line-strong);
 }
 
+/* ---------- Grupos por dia ---------- */
 .day-group__head {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   padding: 0 4px;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--text-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
 }
 .day-group__list {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--radius-group);
+  border-radius: var(--radius-card);
   overflow: hidden;
 }
 
+/* ---------- Item da lista ---------- */
 .expense-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding-right: 16px;
+  transition: background-color var(--dur-fast) ease;
 }
 .expense-item + .expense-item {
   border-top: 1px solid rgba(30, 26, 21, 0.08);
 }
 .expense-item:hover {
-  background: rgba(30, 26, 21, 0.04);
+  background: rgba(30, 26, 21, 0.03);
 }
 .expense-item__main {
   flex: 1;
@@ -61,73 +98,41 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 0 14px 16px;
+  padding: 12px 0 12px 16px;
 }
-
-.expense-item__who-dot {
-  display: none;
-  width: 7px;
-  height: 7px;
-  margin-right: 6px;
-  border-radius: 50%;
-  vertical-align: 1px;
+/* O toque no item não deve "encolher" a linha inteira. */
+.expense-item__main:active:not(:disabled) {
+  transform: none;
 }
-
-/* Mobile: a pessoa vira um ponto colorido na linha de detalhes e o seletor fica compacto. */
-@media (max-width: 819.98px) {
-  .expense-item,
-  .expense-item__main {
-    gap: 10px;
-  }
-  .expense-item {
-    padding-right: 12px;
-  }
-  .expense-item__main {
-    padding-left: 12px;
-  }
-  .expense-item__badge {
-    display: none;
-  }
-  .expense-item__who-dot {
-    display: inline-block;
-  }
-  .expense-item .status-pill {
-    min-width: 96px;
-    gap: 5px;
-    padding: 5px 9px;
-    font-size: 10.5px;
-    letter-spacing: 0.03em;
-  }
+.expense-item__text {
+  flex: 1;
+  min-width: 0;
 }
-.expense-item__icon {
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-serif);
-  font-size: 19px;
-}
-.expense-item__desc,
-.expense-item__meta {
+.expense-item__desc {
+  font-size: var(--text-body);
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.expense-item__desc {
-  font-size: 15px;
-  font-weight: 500;
-}
 .expense-item__meta {
-  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-top: 2px;
+  font-size: var(--text-meta);
   color: var(--muted);
 }
-.expense-item__badge {
-  font-size: 11.5px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 99px;
+.expense-item__meta > span {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.expense-item__amount {
+  flex: none;
+  font-size: var(--text-body);
 }
 
 .empty-state {
@@ -137,4 +142,50 @@
   flex-direction: column;
   align-items: center;
   gap: 14px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 819.98px) {
+  /* Filtro de pessoa rola na horizontal se não couber. */
+  .person-filter-scroll {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .person-filter-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .person-filter-scroll .segmented {
+    width: max-content;
+  }
+  .search {
+    flex-basis: 100%;
+  }
+  .search input {
+    font-size: 16px;
+  }
+
+  .expense-item {
+    gap: 2px;
+    padding-right: 4px;
+  }
+  .expense-item__main {
+    gap: 10px;
+    padding-left: 12px;
+  }
+  /* Status vira círculo de 28px só com ícone, dentro de área de toque de 44px. */
+  .expense-item .status-toggle {
+    width: 44px;
+    height: 44px;
+  }
+  .expense-item .status-pill {
+    min-width: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+  }
+  .expense-item .status-pill__text {
+    display: none;
+  }
 }
