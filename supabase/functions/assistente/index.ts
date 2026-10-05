@@ -30,6 +30,27 @@ const json = (body: Record<string, unknown>, status = 200) =>
 // Lê ANTHROPIC_API_KEY do ambiente (secrets da função).
 const anthropic = new Anthropic();
 
+/**
+ * Chave pública do projeto (anon/publishable). Funciona com o sistema de chaves antigo
+ * (SUPABASE_ANON_KEY) e com o novo (SUPABASE_PUBLISHABLE_KEYS em JSON); por último, usa a
+ * chave pública que o próprio app envia no cabeçalho `apikey`.
+ */
+function resolvePublicKey(req: Request): string | undefined {
+  const legacy = Deno.env.get('SUPABASE_ANON_KEY');
+  if (legacy) return legacy;
+  const keysJson = Deno.env.get('SUPABASE_PUBLISHABLE_KEYS');
+  if (keysJson) {
+    try {
+      const keys = JSON.parse(keysJson) as Record<string, string>;
+      const first = keys.default ?? Object.values(keys)[0];
+      if (first) return first;
+    } catch {
+      // formato inesperado: tenta as próximas opções
+    }
+  }
+  return Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? req.headers.get('apikey') ?? undefined;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ erro: 'Método não permitido.' }, 405);
@@ -38,11 +59,16 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) return json({ erro: 'Não autenticado.' }, 401);
 
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY') ?? Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!,
-    { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } },
-  );
+  const publicKey = resolvePublicKey(req);
+  if (!publicKey) {
+    console.error('Nenhuma chave pública do Supabase disponível na função');
+    return json({ erro: 'Assistente não configurado.' }, 500);
+  }
+
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, publicKey, {
+    global: { headers: { Authorization: authHeader } },
+    auth: { persistSession: false },
+  });
 
   const token = authHeader.replace(/^Bearer\s+/i, '');
   const { data: userData } = await supabase.auth.getUser(token);
