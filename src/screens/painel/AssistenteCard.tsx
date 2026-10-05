@@ -18,6 +18,7 @@ import {
   buildAssistantContext,
   buildTips,
   paceIsOver,
+  type AssistantContext,
   type Tip,
   type TipKind,
   type TipSeverity,
@@ -34,6 +35,7 @@ import type { Expense } from '../../domain/types';
 import { useGastos } from '../../state/GastosContext';
 import { useHideValues } from '../../hooks/useHideValues';
 import { askAssistant } from '../../data/repository';
+import { answerLocally } from '../../domain/localAssistant';
 import { formatBRL } from '../../lib/format';
 import { MONTHS_SHORT, daysInMonth, monthLabel, monthName, shiftMonth } from '../../lib/date';
 
@@ -124,6 +126,7 @@ export function AssistenteCard({ monthKey, monthExpenses, isCurrentMonth }: Assi
       </div>
 
       <AskAssistant
+        money={money}
         buildContext={() =>
           buildAssistantContext({
             monthLabel: monthLabel(monthKey),
@@ -271,10 +274,17 @@ function TipItem({ tip }: { tip: Tip }) {
 
 // ---------------------------------------------------------------------------
 
-function AskAssistant({ buildContext }: { buildContext: () => unknown }) {
+interface AskAssistantProps {
+  buildContext: () => AssistantContext;
+  money: (v: number) => string;
+}
+
+function AskAssistant({ buildContext, money }: AskAssistantProps) {
   const [question, setQuestion] = useState('');
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [answer, setAnswer] = useState('');
+  /** true = resposta das regras locais (IA indisponível ou sem chave). */
+  const [local, setLocal] = useState(false);
   const loading = state === 'loading';
 
   const ask = async (text: string) => {
@@ -282,12 +292,22 @@ function AskAssistant({ buildContext }: { buildContext: () => unknown }) {
     if (!q || loading) return;
     setQuestion(q);
     setState('loading');
+    const context = buildContext();
     try {
-      setAnswer(await askAssistant(q, buildContext()));
+      setAnswer(await askAssistant(q, context));
+      setLocal(false);
       setState('done');
     } catch (e) {
-      console.error(e);
-      setState('error');
+      // Sem IA configurada (ou fora do ar): responde com as regras locais.
+      console.warn('Assistente com IA indisponível; usando respostas automáticas.', e);
+      try {
+        setAnswer(answerLocally(q, context, money));
+        setLocal(true);
+        setState('done');
+      } catch (err) {
+        console.error(err);
+        setState('error');
+      }
     }
   };
 
@@ -328,7 +348,10 @@ function AskAssistant({ buildContext }: { buildContext: () => unknown }) {
         {state === 'done' && (
           <div className="ask__answer">
             <Sparkle size={16} strokeWidth={2} aria-hidden="true" />
-            <p>{answer}</p>
+            <div>
+              <p>{answer}</p>
+              {local && <span className="ask__note">Resposta automática · sem IA</span>}
+            </div>
           </div>
         )}
       </div>
