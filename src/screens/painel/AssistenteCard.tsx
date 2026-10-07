@@ -1,48 +1,29 @@
-import { useMemo, useState, type FormEvent } from 'react';
 import {
   Check,
+  ChevronRight,
   Clock,
   Gauge,
   Minus,
   PiggyBank,
   Plus,
-  Send,
   Sparkle,
   TrendingDown,
   TrendingUp,
   TriangleAlert,
   type LucideIcon,
 } from 'lucide-react';
-import {
-  assistantSummary,
-  buildAssistantContext,
-  buildTips,
-  paceIsOver,
-  type AssistantContext,
-  type Tip,
-  type TipKind,
-  type TipSeverity,
-} from '../../domain/assistant';
-import {
-  categorySummary,
-  contributionFor,
-  previousPeriodTotal,
-  sumAmounts,
-  topExpenses,
-  totalsByPerson,
-} from '../../domain/calculations';
+import { paceIsOver, type AssistantSummary, type Tip, type TipKind, type TipSeverity } from '../../domain/assistant';
 import type { Expense } from '../../domain/types';
 import { useGastos } from '../../state/GastosContext';
-import { useHideValues } from '../../hooks/useHideValues';
-import { askAssistant } from '../../data/repository';
-import { answerLocally } from '../../domain/localAssistant';
-import { formatBRL } from '../../lib/format';
-import { MONTHS_SHORT, daysInMonth, monthLabel, monthName, shiftMonth } from '../../lib/date';
+import { useAssistantData } from '../../hooks/useAssistantData';
+import { MONTHS_SHORT, monthName } from '../../lib/date';
 
 interface AssistenteCardProps {
   monthKey: string;
   monthExpenses: Expense[];
   isCurrentMonth: boolean;
+  /** Abre a conversa com o assistente. */
+  onAsk: () => void;
 }
 
 const TIP_ICONS: Record<TipKind, LucideIcon> = {
@@ -56,46 +37,12 @@ const TIP_ICONS: Record<TipKind, LucideIcon> = {
 };
 const SEVERITY_CLASS: Record<TipSeverity, string> = { 3: 'bad', 2: 'warn', 1: 'info', 0: 'ok' };
 
-const SUGGESTIONS = ['Dá pra jantar fora no sábado?', 'Onde podemos economizar?', 'Como estamos vs. mês passado?'];
-
 const shortDate = (d: Date) => `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
 
-export function AssistenteCard({ monthKey, monthExpenses, isCurrentMonth }: AssistenteCardProps) {
-  const { expenses, budgets, contribs, payday, setPayday } = useGastos();
-  const { hidden, mask } = useHideValues();
-  const money = (v: number) => mask(formatBRL(v));
-
-  // "Hoje" de referência: o dia atual, ou o último dia de um mês já fechado.
-  const today = useMemo(() => {
-    const now = new Date();
-    if (isCurrentMonth) return now;
-    const [y, m] = monthKey.split('-').map(Number);
-    return new Date(y, m - 1, daysInMonth(monthKey));
-  }, [isCurrentMonth, monthKey]);
-
-  const contribution = contributionFor(contribs, monthKey);
-  const deposit = (Number(contribution.enddy) || 0) + (Number(contribution.bento) || 0);
-  const casalExpenses = useMemo(() => monthExpenses.filter((e) => e.who === 'casal'), [monthExpenses]);
-  const summary = assistantSummary({ today, payday, deposit, casalExpenses });
-
-  const categories = useMemo(() => categorySummary(monthExpenses, budgets), [monthExpenses, budgets]);
-  const pending = useMemo(() => monthExpenses.filter((e) => e.status === 'pendente'), [monthExpenses]);
-  const total = sumAmounts(monthExpenses);
-  const prevTotal = useMemo(
-    () => previousPeriodTotal(expenses, monthKey, today, isCurrentMonth),
-    [expenses, monthKey, today, isCurrentMonth],
-  );
-  const dim = daysInMonth(monthKey);
-  const tips = buildTips({
-    categories,
-    monthProgress: (today.getDate() / dim) * 100,
-    daysRemaining: Math.max(1, dim - today.getDate() + 1),
-    pending,
-    total,
-    prevTotal,
-    prevMonthName: monthName(shiftMonth(monthKey, -1)),
-    fmt: money,
-  });
+/** Resumo da conta do casal + dicas do mês. As perguntas ficam na conversa (botão no rodapé). */
+export function AssistenteCard({ monthKey, monthExpenses, isCurrentMonth, onAsk }: AssistenteCardProps) {
+  const { payday, setPayday } = useGastos();
+  const { summary, tips, deposit, money, hidden } = useAssistantData(monthKey, monthExpenses, isCurrentMonth);
 
   return (
     <section className="card assistant-card">
@@ -125,33 +72,19 @@ export function AssistenteCard({ monthKey, monthExpenses, isCurrentMonth }: Assi
         </ul>
       </div>
 
-      <AskAssistant
-        money={money}
-        buildContext={() =>
-          buildAssistantContext({
-            monthLabel: monthLabel(monthKey),
-            isCurrentMonth,
-            today,
-            summary,
-            contribution,
-            byPerson: mapTotals(totalsByPerson(monthExpenses)),
-            categories,
-            pending,
-            prevTotal,
-            total,
-            top: topExpenses(monthExpenses),
-          })
-        }
-      />
+      <button type="button" className="assistant__ask" onClick={onAsk}>
+        <span className="assistant__ask-icon" aria-hidden="true">
+          <Sparkle size={15} strokeWidth={2} />
+        </span>
+        <span className="assistant__ask-text">
+          <strong>Perguntar ao assistente</strong>
+          <span>“Dá pra jantar fora no sábado?”</span>
+        </span>
+        <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
+      </button>
     </section>
   );
 }
-
-const mapTotals = (t: ReturnType<typeof totalsByPerson>) => ({
-  enddy: t.enddy.total,
-  bento: t.bento.total,
-  casal: t.casal.total,
-});
 
 // ---------------------------------------------------------------------------
 
@@ -173,7 +106,7 @@ function PaydayControl({ value, onChange }: { value: number; onChange: (v: numbe
 }
 
 interface CurrentSummaryProps {
-  summary: ReturnType<typeof assistantSummary>;
+  summary: AssistantSummary;
   money: (v: number) => string;
   hidden: boolean;
 }
@@ -269,92 +202,5 @@ function TipItem({ tip }: { tip: Tip }) {
         <div className="tip__text">{tip.text}</div>
       </div>
     </li>
-  );
-}
-
-// ---------------------------------------------------------------------------
-
-interface AskAssistantProps {
-  buildContext: () => AssistantContext;
-  money: (v: number) => string;
-}
-
-function AskAssistant({ buildContext, money }: AskAssistantProps) {
-  const [question, setQuestion] = useState('');
-  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
-  const [answer, setAnswer] = useState('');
-  /** true = resposta das regras locais (IA indisponível ou sem chave). */
-  const [local, setLocal] = useState(false);
-  const loading = state === 'loading';
-
-  const ask = async (text: string) => {
-    const q = text.trim();
-    if (!q || loading) return;
-    setQuestion(q);
-    setState('loading');
-    const context = buildContext();
-    try {
-      setAnswer(await askAssistant(q, context));
-      setLocal(false);
-      setState('done');
-    } catch (e) {
-      // Sem IA configurada (ou fora do ar): responde com as regras locais.
-      console.warn('Assistente com IA indisponível; usando respostas automáticas.', e);
-      try {
-        setAnswer(answerLocally(q, context, money));
-        setLocal(true);
-        setState('done');
-      } catch (err) {
-        console.error(err);
-        setState('error');
-      }
-    }
-  };
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    ask(question);
-  };
-
-  return (
-    <div className="ask">
-      <div className="ask__chips">
-        {SUGGESTIONS.map((s) => (
-          <button key={s} type="button" className="ask__chip" disabled={loading} onClick={() => ask(s)}>
-            {s}
-          </button>
-        ))}
-      </div>
-
-      <form className="ask__form" onSubmit={submit}>
-        <input
-          className="ask__input"
-          value={question}
-          maxLength={300}
-          placeholder="Pergunte ao assistente…"
-          aria-label="Pergunta ao assistente"
-          onChange={(e) => setQuestion(e.target.value)}
-        />
-        <button type="submit" className="ask__send" aria-label="Enviar pergunta" disabled={loading || !question.trim()}>
-          <Send size={18} strokeWidth={2} aria-hidden="true" />
-        </button>
-      </form>
-
-      <div aria-live="polite">
-        {state === 'loading' && <p className="ask__status">Analisando os gastos de vocês…</p>}
-        {state === 'error' && (
-          <p className="ask__status is-error">Não consegui responder agora. Tente de novo em instantes.</p>
-        )}
-        {state === 'done' && (
-          <div className="ask__answer">
-            <Sparkle size={16} strokeWidth={2} aria-hidden="true" />
-            <div>
-              <p>{answer}</p>
-              {local && <span className="ask__note">Resposta automática · sem IA</span>}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
   );
 }

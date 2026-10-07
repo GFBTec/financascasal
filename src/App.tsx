@@ -16,6 +16,7 @@ import { GastosScreen } from './screens/gastos/GastosScreen';
 import { OrcamentoScreen } from './screens/orcamento/OrcamentoScreen';
 import { ExpenseModal } from './modals/ExpenseModal';
 import { ContaCasalModal } from './modals/ContaCasalModal';
+import { AssistantChat, type ChatMessage } from './modals/AssistantChat';
 import './components/layout/layout.css';
 
 /** null = fechado; { expense: undefined } = novo gasto. */
@@ -34,6 +35,8 @@ export default function App() {
   const [monthKey, setMonthKey] = useState(currentMonthKey);
   const [expenseModal, setExpenseModal] = useState<ExpenseModalState>(null);
   const [contribOpen, setContribOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const isCurrentMonth = monthKey === currentMonthKey();
   const monthExpenses = useMemo(() => expensesInMonth(expenses, monthKey), [expenses, monthKey]);
@@ -42,6 +45,8 @@ export default function App() {
   const openEdit = useCallback((expense: Expense) => setExpenseModal({ expense }), []);
   const closeExpenseModal = useCallback(() => setExpenseModal(null), []);
   const closeContrib = useCallback(() => setContribOpen(false), []);
+  const openChat = useCallback(() => setChatOpen(true), []);
+  const closeChat = useCallback(() => setChatOpen(false), []);
 
   const handleSave = (expense: Expense) => {
     const isEdit = !!expenseModal?.expense;
@@ -59,7 +64,13 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar screen={screen} monthCount={monthExpenses.length} onNavigate={setScreen} onNewExpense={openNew} />
+      <Sidebar
+        screen={screen}
+        monthCount={monthExpenses.length}
+        onNavigate={setScreen}
+        onNewExpense={openNew}
+        onOpenAssistant={openChat}
+      />
 
       <main className="main">
         <header className="page-header">
@@ -84,6 +95,7 @@ export default function App() {
             onEditExpense={openEdit}
             onEditContribution={() => setContribOpen(true)}
             onGoToBudget={() => setScreen('orcamento')}
+            onAskAssistant={openChat}
           />
         )}
         {screen === 'gastos' && (
@@ -100,7 +112,24 @@ export default function App() {
         )}
       </main>
 
-      <TabBar screen={screen} composing={!!expenseModal} onNavigate={setScreen} onNewExpense={openNew} />
+      <TabBar
+        screen={screen}
+        composing={!!expenseModal || chatOpen}
+        onNavigate={setScreen}
+        onNewExpense={openNew}
+        onOpenAssistant={openChat}
+      />
+
+      {chatOpen && (
+        <AssistantChat
+          monthKey={monthKey}
+          monthExpenses={monthExpenses}
+          isCurrentMonth={isCurrentMonth}
+          messages={chatMessages}
+          setMessages={setChatMessages}
+          onClose={closeChat}
+        />
+      )}
 
       {expenseModal && (
         <ExpenseModal

@@ -75,8 +75,46 @@
   font-weight: 600;
   opacity: 0.6;
 }
+.sidebar__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .sidebar__new {
   justify-content: space-between;
+}
+/* Botão do assistente: borda em degradê tech. */
+.sidebar__assistant {
+  min-height: 48px;
+  padding: 0 12px 0 18px;
+  border-radius: var(--radius-ctl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-body);
+  font-weight: 600;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(120deg, oklch(0.8 0.13 200), oklch(0.6 0.21 285)) border-box;
+}
+.sidebar__assistant:hover {
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(120deg, oklch(0.8 0.13 200), oklch(0.6 0.21 285)) border-box;
+}
+.sidebar__assistant-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--grad-tech-diag);
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+.sidebar__assistant:hover .sidebar__assistant-icon {
+  transform: rotate(90deg) scale(1.1);
 }
 .sidebar__plus {
   transition: transform var(--dur-slow) var(--ease-spring);
@@ -246,6 +284,79 @@
 }
 .fab:active:not(:disabled) {
   transform: scale(0.88);
+}
+.fab[aria-expanded='true'] {
+  z-index: 41;
+}
+
+/* ---------- Menu do "+": Lançar gasto · Falar com Assistente ---------- */
+.fab-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(30, 26, 21, 0.38);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: fade-in var(--dur) ease both;
+}
+.fab-menu__items {
+  position: absolute;
+  right: 18px;
+  bottom: calc(92px + 60px + 14px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.fab-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fab-item-in var(--dur-slow) var(--ease-spring) both;
+}
+/* Cascata: o item mais perto do "+" aparece primeiro. */
+.fab-menu__item:last-child {
+  animation-delay: 0ms;
+}
+.fab-menu__item:first-child {
+  animation-delay: 60ms;
+}
+.fab-menu__label {
+  padding: 9px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(30, 26, 21, 0.18);
+}
+.fab-menu__icon {
+  width: 52px;
+  height: 52px;
+  margin-right: 4px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(30, 26, 21, 0.2);
+}
+.fab-menu__icon.is-ai {
+  background: var(--grad-tech-diag);
+  color: #fff;
+  box-shadow:
+    0 6px 18px rgba(30, 26, 21, 0.2),
+    var(--glow-tech);
+}
+.fab-menu__item:active .fab-menu__icon {
+  transform: scale(0.92);
+}
+@keyframes fab-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.85);
+  }
 }
 .fab.is-open {
   background: var(--ink-hover);

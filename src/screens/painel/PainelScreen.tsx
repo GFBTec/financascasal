@@ -28,6 +28,7 @@ interface PainelScreenProps {
   onEditExpense: (expense: Expense) => void;
   onEditContribution: () => void;
   onGoToBudget: () => void;
+  onAskAssistant: () => void;
 }
 
 /**
@@ -46,6 +47,7 @@ export function PainelScreen({
   onEditExpense,
   onEditContribution,
   onGoToBudget,
+  onAskAssistant,
 }: PainelScreenProps) {
   const { expenses, budgets, contribs } = useGastos();
   const totals = useMemo(() => totalsByPerson(monthExpenses), [monthExpenses]);
@@ -69,7 +71,12 @@ export function PainelScreen({
         <QuemGastouCard totals={totals} />
       </div>
 
-      <AssistenteCard monthKey={monthKey} monthExpenses={monthExpenses} isCurrentMonth={isCurrentMonth} />
+      <AssistenteCard
+        monthKey={monthKey}
+        monthExpenses={monthExpenses}
+        isCurrentMonth={isCurrentMonth}
+        onAsk={onAskAssistant}
+      />
 
       <EvolucaoDiariaCard
         key={monthKey}

@@ -1,4 +1,4 @@
-import { LogOut, Plus } from 'lucide-react';
+import { LogOut, Plus, Sparkle } from 'lucide-react';
 import { PEOPLE } from '../../domain/constants';
 import type { Screen } from '../../domain/types';
 import { useAuth } from '../../state/AuthContext';
@@ -11,9 +11,10 @@ interface SidebarProps {
   monthCount: number;
   onNavigate: (screen: Screen) => void;
   onNewExpense: () => void;
+  onOpenAssistant: () => void;
 }
 
-export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: SidebarProps) {
+export function Sidebar({ screen, monthCount, onNavigate, onNewExpense, onOpenAssistant }: SidebarProps) {
   const { email, signOut } = useAuth();
   return (
     <aside className="sidebar">
@@ -41,10 +42,18 @@ export function Sidebar({ screen, monthCount, onNavigate, onNewExpense }: Sideba
         })}
       </nav>
 
-      <button type="button" className="btn-primary sidebar__new" onClick={onNewExpense}>
-        <span>Novo gasto</span>
-        <Plus className="sidebar__plus" size={20} strokeWidth={2} aria-hidden="true" />
-      </button>
+      <div className="sidebar__actions">
+        <button type="button" className="btn-primary sidebar__new" onClick={onNewExpense}>
+          <span>Novo gasto</span>
+          <Plus className="sidebar__plus" size={20} strokeWidth={2} aria-hidden="true" />
+        </button>
+        <button type="button" className="sidebar__assistant" onClick={onOpenAssistant}>
+          <span>Assistente</span>
+          <span className="sidebar__assistant-icon" aria-hidden="true">
+            <Sparkle size={15} strokeWidth={2} />
+          </span>
+        </button>
+      </div>
 
       <div className="sidebar__legend">
         <div className="row">
